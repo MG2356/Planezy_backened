@@ -1,9 +1,10 @@
 const express = require("express");
 const mongoose = require('mongoose');
 const SignupModel = require("./Schema/Signup");
-const ProductModel = require("./Schema/product")
+const PlaceModel = require("./Schema/Place")
+const TrendingPlaceModel=require("./Schema/TrendingPlace")
+const TripModel=require("./Schema/Trip")
 const dotenv = require("dotenv");
-const emailRoutes = require("./routes/emailRoutes");
 const jwt = require('jsonwebtoken');
 const BASE_URL = process.env.BASE_URL
 const PORT = process.env.PORT||8000;
@@ -31,7 +32,6 @@ mongoose.connect('mongodb+srv://munishgoel45698:9r3jwSuO1CzegsfD@cluster0.9r9br1
 .catch(err => console.log("Error connecting to db: ", err));
 
 // Routes
-app.use("/email", emailRoutes);
 
 // User registration
 app.post('/Register', (req, res) => {
@@ -56,7 +56,7 @@ app.post("/login", (req, res) => {
         if (user.password === password) {
           const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
           console.log("Generated Token: ", token);
-          res.json({ message: "Success", token });
+          res.json({ message: "Success", token , status:Boolean });
         } else {
           res.status(401).json({ message: "Invalid password" });
         }
@@ -69,69 +69,108 @@ app.post("/login", (req, res) => {
       res.status(500).json({ error: "Login failed" });
     });
 });
-//product add 
+//place add 
 
-app.post('/addProduct', (req, res) => {
-  ProductModel.create(req.body)
-    .then(product => {
-      res.json({ product });
+app.post('/addplace', (req, res) => {
+  PlaceModel.create(req.body)
+    .then(place => {
+      res.json({ place });
     })
     .catch(err => {
-      console.log("Error during adding the product: ", err);
+      console.log("Error during adding the place: ", err);
     });
 });
-// Update product by ID
-app.put('/updateProduct/:id', (req, res) => {
-  const { id } = req.params;
-  ProductModel.findByIdAndUpdate(id, req.body, { new: true })
-    .then(updatedProduct => {
-      if (!updatedProduct) {
-        return res.status(404).json({ message: "Product not found" });
-      }
-      res.json({ updatedProduct });
+app.post('/addtrendingplace', (req, res) => {
+  TrendingPlaceModel.create(req.body)
+    .then(trendingplace => {
+      res.json({ trendingplace });
     })
     .catch(err => {
-      console.log("Error during updating the product: ", err);
-      res.status(500).json({ error: "Updating product failed" });
+      console.log("Error during adding the place: ", err);
     });
 });
-// Delete product by ID
-app.delete('/deleteProduct/:id', (req, res) => {
-  const { id } = req.params;
-  ProductModel.findByIdAndDelete(id)
-    .then(deletedProduct => {
-      if (!deletedProduct) {
-        return res.status(404).json({ message: "Product not found" });
-      }
-      res.json({ message: "Product deleted successfully" });
+app.post('/addTrip', (req, res) => {
+  TripModel.create(req.body)
+    .then(tripplace => {
+      res.json({ tripplace });
     })
     .catch(err => {
-      console.log("Error during deleting the product: ", err);
-      res.status(500).json({ error: "Deleting product failed" });
+      console.log("Error during adding the place: ", err);
+    });
+});
+
+// Update place by ID
+app.put('/updateplace/:id', (req, res) => {
+  const { id } = req.params;
+  PlaceModel.findByIdAndUpdate(id, req.body, { new: true })
+    .then(updatedplace => {
+      if (!updatedplace) {
+        return res.status(404).json({ message: "place not found" });
+      }
+      res.json({ updatedplace });
+    })
+    .catch(err => {
+      console.log("Error during updating the place: ", err);
+      res.status(500).json({ error: "Updating place failed" });
+    });
+});
+// Delete place by ID
+app.delete('/deleteplace/:id', (req, res) => {
+  const { id } = req.params;
+  PlaceModel.findByIdAndDelete(id)
+    .then(deletedplace => {
+      if (!deletedplace) {
+        return res.status(404).json({ message: "place not found" });
+      }
+      res.json({ message: "place deleted successfully" });
+    })
+    .catch(err => {
+      console.log("Error during deleting the place: ", err);
+      res.status(500).json({ error: "Deleting place failed" });
     });
 });
 // get user
-app.get('/getProduct' ,(req,res)=>{
-  ProductModel.find({}).sort('-date') 
+app.get('/getplace' ,(req,res)=>{
+  PlaceModel.find({}).sort('-date') 
 
-  .then(product => res.json(product))
+  .then(place => res.json(place))
   .catch(err=>res.json(err))
 
 })
+app.get('/recentlyViewed' ,(req,res)=>{
+  PlaceModel.find({}).sort('-date') 
 
-app.get('/product/:id', (req, res) => {
+  .then(place => res.json(place))
+  .catch(err=>res.json(err))
+
+})
+app.get('/trendingPlace' ,(req,res)=>{
+  TrendingPlaceModel.find({}).sort('-date') 
+
+  .then(place => res.json(place))
+  .catch(err=>res.json(err))
+
+})
+app.get('/trip' ,(req,res)=>{
+  TripModel.find({}).sort('-date') 
+
+  .then(place => res.json(place))
+  .catch(err=>res.json(err))
+
+})
+app.get('/place/:id', (req, res) => {
   const { id } = req.params;
 
-  ProductModel.findById(id)
-    .then(product => {
-      if (!product) {
-        return res.status(404).json({ message: "Product not found" });
+  PlaceModel.findById(id)
+    .then(place => {
+      if (!place) {
+        return res.status(404).json({ message: "place not found" });
       }
-      res.json({ product });
+      res.json({ place });
     }) 
     .catch(err => {
-      console.log("Error during fetching the product: ", err);
-      res.status(500).json({ error: "Fetching product failed" });
+      console.log("Error during fetching the place: ", err);
+      res.status(500).json({ error: "Fetching place failed" });
     });
 });
 app.listen(PORT, () => {
