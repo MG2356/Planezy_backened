@@ -35,39 +35,32 @@ mongoose.connect('mongodb+srv://munishgoel45698:9r3jwSuO1CzegsfD@cluster0.9r9br1
 
 // User registration
 app.post('/Register', (req, res) => {
-  SignupModel.create(req.body)
-    .then(signup => {
-      const token = jwt.sign({ id: signup._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-      console.log("Generated Token: ", token);
-      res.json({ signup, token });
-    })
-    .catch(err => {
-      console.log("Error during registration: ", err);
-      res.status(500).json({ error: "Registration failed" });
-    });
+  SignupModel.create(req.body )
+  .then(Signup => res.json(Signup))
+  .catch(err=>res.json(err));
 });
 
 // User login
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
-  SignupModel.findOne({ email: email })
-    .then(user => {
-      if (user) {
-        if (user.password === password) {
-          const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-          console.log("Generated Token: ", token);
-          res.json({ message: "Success", token , status:Boolean });
-        } else {
-          res.status(401).json({ message: "Invalid password" });
-        }
-      } else {
-        res.status(404).json({ message: "No record found" });
+  SignupModel.findOne({email:email})
+
+  .then(user =>{
+
+      if(user){
+          if(user.password===password){
+              res.json("Success")
+              // res.json({ success: true });
+
+          }
+          else{
+              console.log("invalid password is incorrect")
+          }
       }
-    })
-    .catch(err => {
-      console.log("Error during login: ", err);
-      res.status(500).json({ error: "Login failed" });
-    });
+      else{
+          console.log("no record found")
+      }
+  })
 });
 //place add 
 
