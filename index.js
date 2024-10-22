@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require('mongoose');
 const SignupModel = require("./Schema/Signup");
 const PlaceModel = require("./Schema/Place")
+const CommunityModel=require("./Schema/Community");
 const TrendingPlaceModel=require("./Schema/TrendingPlace")
 const TripModel=require("./Schema/Trip")
 const dotenv = require("dotenv");
@@ -91,7 +92,16 @@ app.post('/addTrip', (req, res) => {
       console.log("Error during adding the place: ", err);
     });
 });
-
+//community post
+app.post('/createPost', (req, res) => {
+  CommunityModel.create(req.body)
+    .then(CommunityData => {
+      res.json({ CommunityData });
+    })
+    .catch(err => {
+      console.log("Error during adding the place: ", err);
+    });
+});
 // Update place by ID
 app.put('/updateplace/:id', (req, res) => {
   const { id } = req.params;
@@ -141,6 +151,14 @@ app.get('/trendingPlace' ,(req,res)=>{
   TrendingPlaceModel.find({}).sort('-date') 
 
   .then(place => res.json(place))
+  .catch(err=>res.json(err))
+
+})
+//get community post
+app.get('/getPost' ,(req,res)=>{
+  CommunityModel.find({}).sort('-date') 
+
+  .then(CommunityData => res.json(CommunityData))
   .catch(err=>res.json(err))
 
 })
