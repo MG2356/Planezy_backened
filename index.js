@@ -157,10 +157,8 @@ app.get('/trendingPlace' ,(req,res)=>{
 //get community post
 app.get('/getPost' ,(req,res)=>{
   CommunityModel.find({}).sort('-date') 
-
   .then(CommunityData => res.json(CommunityData))
   .catch(err=>res.json(err))
-
 })
 app.get('/trip' ,(req,res)=>{
   TripModel.find({}).sort('-date') 
