@@ -164,6 +164,13 @@ app.get('/getrecommended' ,(req,res)=>{
   .catch(err=>res.json(err))
 
 })
+//get the trending places
+app.get('/gettrendingplace' ,(req,res)=>{
+  TrendingPlaceModel.find({}).sort('-date') 
+  .then(place => res.json(place))
+  .catch(err=>res.json(err))
+
+})
 app.get('/getUser', (req, res) => {
   SignupModel.find({}).sort('-date') 
 
