@@ -4,10 +4,10 @@ const SignupModel = require("./Schema/Signup");
 const PlaceModel = require("./Schema/Place")
 const CommunityModel=require("./Schema/Community");
 const TrendingPlaceModel=require("./Schema/TrendingPlace")
+const RecommendedPlaceModel=require("./Schema/RecommendedPlace")
 const TripModel=require("./Schema/Trip")
 const dotenv = require("dotenv");
-const jwt = require('jsonwebtoken');
-const BASE_URL = process.env.BASE_URL
+
 const PORT = process.env.PORT||8000;
 
 const app = express();
@@ -74,6 +74,8 @@ app.post('/addplace', (req, res) => {
       console.log("Error during adding the place: ", err);
     });
 });
+//create trending place 
+
 app.post('/addtrendingplace', (req, res) => {
   TrendingPlaceModel.create(req.body)
     .then(trendingplace => {
@@ -83,6 +85,7 @@ app.post('/addtrendingplace', (req, res) => {
       console.log("Error during adding the place: ", err);
     });
 });
+//create trip
 app.post('/addTrip', (req, res) => {
   TripModel.create(req.body)
     .then(tripplace => {
@@ -92,6 +95,17 @@ app.post('/addTrip', (req, res) => {
       console.log("Error during adding the place: ", err);
     });
 });
+// craete recommended trip
+app.post('/addRecommendedTrip', (req, res) => {
+  RecommendedPlaceModel.create(req.body)
+    .then(recommendedplace => {
+      res.json({ recommendedplace });
+    })
+    .catch(err => {
+      console.log("Error during adding the place: ", err);
+    });
+});
+
 //community post
 app.post('/createPost', (req, res) => {
   CommunityModel.create(req.body)
@@ -132,7 +146,10 @@ app.delete('/deleteplace/:id', (req, res) => {
       res.status(500).json({ error: "Deleting place failed" });
     });
 });
-// get user
+
+
+
+// get place
 app.get('/getplace' ,(req,res)=>{
   PlaceModel.find({}).sort('-date') 
 
@@ -140,6 +157,19 @@ app.get('/getplace' ,(req,res)=>{
   .catch(err=>res.json(err))
 
 })
+//get recommended place 
+app.get('/getrecommended' ,(req,res)=>{
+  RecommendedPlaceModel.find({}).sort('-date') 
+  .then(place => res.json(place))
+  .catch(err=>res.json(err))
+
+})
+app.get('/getUser', (req, res) => {
+  SignupModel.find({}).sort('-date') 
+
+  .then(Signup => res.json(Signup))
+  .catch(err=>res.json(err));
+});
 app.get('/recentlyViewed' ,(req,res)=>{
   PlaceModel.find({}).sort('-date') 
 
@@ -155,7 +185,7 @@ app.get('/trendingPlace' ,(req,res)=>{
 
 })
 //get community post
-app.get('/getPost' ,(req,res)=>{
+app.get('/getpost' ,(req,res)=>{
   CommunityModel.find({}).sort('-date') 
   .then(CommunityData => res.json(CommunityData))
   .catch(err=>res.json(err))

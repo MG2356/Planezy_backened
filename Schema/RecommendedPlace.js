@@ -4,7 +4,10 @@ const RecommendedPlaceSchema = new mongoose.Schema({
   RecommendedPlaceName: String,
   RecommendedPlaceAddress: String,
   RecommendedPlaceDescription: String,
+  RecommendedPlaceCategory: String,
   RecommendedPlaceRating: Number
 });
 
-module.exports = RecommendedPlaceSchema;
+const RecommendedPlaceModel=mongoose.model("RecommendedPlace",RecommendedPlaceSchema)
+module.exports=RecommendedPlaceModel
+

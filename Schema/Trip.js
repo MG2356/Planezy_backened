@@ -1,10 +1,22 @@
 const mongoose=require('mongoose')
-const RecommendedPlaceSchema = require('./RecommendedPlace');
 const TripSchema = new mongoose.Schema({
     TripName: String,
-    TripDate: Date,
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'UserAccount' },
-RecommendedPlaces: [RecommendedPlaceSchema]
+    TripStartDate: Date,
+    TripEndDate: Date
+
+  
   });
 const TripModel=mongoose.model("Trip",TripSchema)
 module.exports=TripModel
+
+// Define the Trip schema with a reference to the Signup schema
+
+// const TripSchema = new mongoose.Schema({
+//   TripName: String,
+//   TripStartDate: Date,
+//   TripEndDate: Date,
+//   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'Signup' } // Reference to the Signup schema
+// });
+
+// const TripModel = mongoose.model("Trip", TripSchema);
+// module.exports = TripModel;
