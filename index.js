@@ -10,6 +10,7 @@ const dotenv = require("dotenv");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const PORT = process.env.PORT||8000;
+const tripRoutes = require('./tripRoutes');
 
 const app = express();
 dotenv.config();
@@ -100,58 +101,9 @@ app.post('/addtrendingplace', (req, res) => {
       console.log("Error during adding the place: ", err);
     });
 });
-//create trip
-// app.post('/addTrip', (req, res) => {
-//   TripModel.create(req.body)
-//     .then(tripplace => {
-//       res.json({ tripplace });
-//     })
-//     .catch(err => {
-//       console.log("Error during adding the place: ", err);
-//     });
-// });
 
-app.post('/addTrip', authenticateToken, (req, res) => {
-  const tripData = { ...req.body, userId: req.userId };
+  app.use('/trip', tripRoutes);
 
-  TripModel.create(tripData)
-    .then(trip => res.json({ trip }))
-    .catch(err => {
-      console.log("Error during adding the trip: ", err);
-      res.status(500).json({ error: 'Error adding trip' });
-    });
-});
-// Get User's Trips Route (Requires Authentication)
-app.get('/myTrips', authenticateToken, async (req, res) => {
-  try {
-    const trips = await TripModel.find({ userId: req.userId });
-    res.json({ trips });
-  } catch (err) {
-    console.error("Error fetching user's trips:", err);
-    res.status(500).json({ error: 'Error fetching trips' });
-  }
-});
-
-// Get User's Name and Created Trips (Requires Authentication)
-app.get('/userTrips', authenticateToken, async (req, res) => {
-    try {
-      // Find the user by ID and populate their trips
-      const user = await SignupModel.findById(req.userId).select('firstName lastName');
-      const trips = await TripModel.find({ userId: req.userId }).select('TripName TripStartDate TripEndDate');
-  
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-  
-      res.json({
-        userName: `${user.firstName} ${user.lastName}`,
-        trips: trips
-      });
-    } catch (err) {
-      console.error("Error fetching user's name and trips:", err);
-      res.status(500).json({ error: 'Error fetching user data' });
-    }
-  });
 
 // craete recommended trip
 app.post('/addRecommendedTrip', (req, res) => {
