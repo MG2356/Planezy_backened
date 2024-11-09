@@ -50,3 +50,201 @@ app.get('/userTrips', authenticateToken, async (req, res) => {
       res.status(500).json({ error: 'Error fetching user data' });
     }
   });
+//1. FlightDetailsForm.swift
+
+import SwiftUI
+
+struct FlightDetailsForm: View {
+    @State private var airline = ""
+    @State private var flightNumber = ""
+    @State private var departureLocation = ""
+    @State private var arrivalLocation = ""
+    @State private var departureTime = Date()
+    @State private var arrivalTime = Date()
+
+    var body: some View {
+        Form {
+            Section(header: Text("Flight Details")) {
+                TextField("Airline", text: $airline)
+                TextField("Flight Number", text: $flightNumber)
+                TextField("Departure Location", text: $departureLocation)
+                TextField("Arrival Location", text: $arrivalLocation)
+                DatePicker("Departure Time", selection: $departureTime, displayedComponents: .date)
+                DatePicker("Arrival Time", selection: $arrivalTime, displayedComponents: .date)
+                
+                Button(action: submitFlightDetails) {
+                    Text("Submit Flight Details")
+                }
+            }
+        }
+    }
+    
+    func submitFlightDetails() {
+        let url = URL(string: "https://planezy-backened-sb7y.onrender.com/trip/addFlightToTrip")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        
+        let flightDetails = [
+            "airline": airline,
+            "flightNumber": flightNumber,
+            "departureLocation": departureLocation,
+            "arrivalLocation": arrivalLocation,
+            "departureTime": departureTime.iso8601String,
+            "arrivalTime": arrivalTime.iso8601String
+        ]
+        
+        request.httpBody = try? JSONSerialization.data(withJSONObject: flightDetails)
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            // Handle response
+        }.resume()
+    }
+}
+
+// Helper to format Date to ISO8601
+extension Date {
+    var iso8601String: String {
+        let formatter = ISO8601DateFormatter()
+        return formatter.string(from: self)
+    }
+}
+
+
+
+//2. HotelDetailsForm.swift
+swift
+Copy code
+
+  struct HotelDetailsForm: View {
+    @State private var name = ""
+    @State private var location = ""
+    @State private var checkInTime = Date()
+    @State private var checkOutTime = Date()
+    
+    var body: some View {
+        Form {
+            Section(header: Text("Hotel Details")) {
+                TextField("Name", text: $name)
+                TextField("Location", text: $location)
+                DatePicker("Check-In Time", selection: $checkInTime, displayedComponents: .date)
+                DatePicker("Check-Out Time", selection: $checkOutTime, displayedComponents: .date)
+                
+                Button(action: submitHotelDetails) {
+                    Text("Submit Hotel Details")
+                }
+            }
+        }
+    }
+    
+    func submitHotelDetails() {
+        let url = URL(string: "https://planezy-backened-sb7y.onrender.com/trip/addHotelToTrip")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        
+        let hotelDetails = [
+            "name": name,
+            "location": location,
+            "checkInTime": checkInTime.iso8601String,
+            "checkOutTime": checkOutTime.iso8601String
+        ]
+        
+        request.httpBody = try? JSONSerialization.data(withJSONObject: hotelDetails)
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            // Handle response
+        }.resume()
+    }
+}
+
+//3 RestaurantDetailsForm
+  struct RestaurantDetailsForm: View {
+    @State private var name = ""
+    @State private var location = ""
+    @State private var openingTime = Date()
+    @State private var closingTime = Date()
+
+    var body: some View {
+        Form {
+            Section(header: Text("Restaurant Details")) {
+                TextField("Name", text: $name)
+                TextField("Location", text: $location)
+                DatePicker("Opening Time", selection: $openingTime, displayedComponents: .date)
+                DatePicker("Closing Time", selection: $closingTime, displayedComponents: .date)
+                
+                Button(action: submitRestaurantDetails) {
+                    Text("Submit Restaurant Details")
+                }
+            }
+        }
+    }
+
+    func submitRestaurantDetails() {
+        let url = URL(string: "https://planezy-backened-sb7y.onrender.com/trip/addRestaurantToTrip")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        
+        let restaurantDetails = [
+            "name": name,
+            "location": location,
+            "openingTime": openingTime.iso8601String,
+            "closingTime": closingTime.iso8601String
+        ]
+        
+        request.httpBody = try? JSONSerialization.data(withJSONObject: restaurantDetails)
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            // Handle response
+        }.resume()
+    }
+}
+4. CarDetailsForm
+struct CarDetailsForm: View {
+    @State private var name = ""
+    @State private var type = ""
+    @State private var pickUpLocation = ""
+    @State private var dropOffLocation = ""
+    @State private var pickUpTime = Date()
+    @State private var dropOffTime = Date()
+
+    var body: some View {
+        Form {
+            Section(header: Text("Car Details")) {
+                TextField("Name", text: $name)
+                TextField("Type", text: $type)
+                TextField("Pick-Up Location", text: $pickUpLocation)
+                TextField("Drop-Off Location", text: $dropOffLocation)
+                DatePicker("Pick-Up Time", selection: $pickUpTime, displayedComponents: .date)
+                DatePicker("Drop-Off Time", selection: $dropOffTime, displayedComponents: .date)
+                
+                Button(action: submitCarDetails) {
+                    Text("Submit Car Details")
+                }
+            }
+        }
+    }
+
+    func submitCarDetails() {
+        let url = URL(string: "https://planezy-backened-sb7y.onrender.com/trip/addCarToTrip")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        
+        let carDetails = [
+            "name": name,
+            "type": type,
+            "pickUpLocation": pickUpLocation,
+            "dropOffLocation": dropOffLocation,
+            "pickUpTime": pickUpTime.iso8601String,
+            "dropOffTime": dropOffTime.iso8601String
+        ]
+        
+        request.httpBody = try? JSONSerialization.data(withJSONObject: carDetails)
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            // Handle response
+        }.resume()
+    }
+}
