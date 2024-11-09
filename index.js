@@ -7,11 +7,13 @@ const TrendingPlaceModel=require("./Schema/TrendingPlace")
 const RecommendedPlaceModel=require("./Schema/RecommendedPlace")
 const TripModel=require("./Schema/Trip")
 const dotenv = require("dotenv");
-
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const PORT = process.env.PORT||8000;
 
 const app = express();
 dotenv.config();
+const SECRET_KEY = 'your_secret_key';
 
 const cors = require("cors");
 const corsOptions = {
@@ -33,35 +35,48 @@ mongoose.connect('mongodb+srv://munishgoel45698:9r3jwSuO1CzegsfD@cluster0.9r9br1
 .catch(err => console.log("Error connecting to db: ", err));
 
 // Routes
+// Middleware for Authentication
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) return res.sendStatus(401);  // Unauthorized if no token is found
+
+  jwt.verify(token, SECRET_KEY, (err, decoded) => {
+    if (err) return res.sendStatus(403);  // Forbidden if token is invalid
+    req.userId = decoded.userId;
+    next();
+  });
+};
+
 
 // User registration
-app.post('/Register', (req, res) => {
-  SignupModel.create(req.body )
-  .then(Signup => res.json(Signup))
-  .catch(err=>res.json(err));
+app.post('/Register',async (req, res) => {
+  try {
+    const user = new SignupModel(req.body);
+    await user.save();
+    res.status(201).json({ message: "User created successfully" });
+  } catch (err) {
+    console.error("Error during user signup:", err);
+    res.status(500).json({ error: "User signup failed" });
+  }
 });
 
 // User login
-app.post("/login", (req, res) => {
+app.post("/login", async(req, res) => {
   const { email, password } = req.body;
-  SignupModel.findOne({email:email})
+  try {
+    const user = await SignupModel.findOne({ email });
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
 
-  .then(user =>{
-
-      if(user){
-          if(user.password===password){
-              res.json("Success")
-              // res.json({ success: true });
-
-          }
-          else{
-              console.log("invalid password is incorrect")
-          }
-      }
-      else{
-          console.log("no record found")
-      }
-  })
+    const token = jwt.sign({ userId: user._id }, SECRET_KEY, { expiresIn: '1h' });
+    res.json({ token });
+  } catch (err) {
+    console.error("Error during user login:", err);
+    res.status(500).json({ error: "User login failed" });
+  }
 });
 //place add 
 
@@ -86,15 +101,58 @@ app.post('/addtrendingplace', (req, res) => {
     });
 });
 //create trip
-app.post('/addTrip', (req, res) => {
-  TripModel.create(req.body)
-    .then(tripplace => {
-      res.json({ tripplace });
-    })
+// app.post('/addTrip', (req, res) => {
+//   TripModel.create(req.body)
+//     .then(tripplace => {
+//       res.json({ tripplace });
+//     })
+//     .catch(err => {
+//       console.log("Error during adding the place: ", err);
+//     });
+// });
+
+app.post('/addTrip', authenticateToken, (req, res) => {
+  const tripData = { ...req.body, userId: req.userId };
+
+  TripModel.create(tripData)
+    .then(trip => res.json({ trip }))
     .catch(err => {
-      console.log("Error during adding the place: ", err);
+      console.log("Error during adding the trip: ", err);
+      res.status(500).json({ error: 'Error adding trip' });
     });
 });
+// Get User's Trips Route (Requires Authentication)
+app.get('/myTrips', authenticateToken, async (req, res) => {
+  try {
+    const trips = await TripModel.find({ userId: req.userId });
+    res.json({ trips });
+  } catch (err) {
+    console.error("Error fetching user's trips:", err);
+    res.status(500).json({ error: 'Error fetching trips' });
+  }
+});
+
+// Get User's Name and Created Trips (Requires Authentication)
+app.get('/userTrips', authenticateToken, async (req, res) => {
+    try {
+      // Find the user by ID and populate their trips
+      const user = await SignupModel.findById(req.userId).select('firstName lastName');
+      const trips = await TripModel.find({ userId: req.userId }).select('TripName TripStartDate TripEndDate');
+  
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      res.json({
+        userName: `${user.firstName} ${user.lastName}`,
+        trips: trips
+      });
+    } catch (err) {
+      console.error("Error fetching user's name and trips:", err);
+      res.status(500).json({ error: 'Error fetching user data' });
+    }
+  });
+
 // craete recommended trip
 app.post('/addRecommendedTrip', (req, res) => {
   RecommendedPlaceModel.create(req.body)

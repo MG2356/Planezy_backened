@@ -1,14 +1,50 @@
-const mongoose=require('mongoose')
+// const mongoose=require('mongoose')
 
-const SignupSchema=new mongoose.Schema({
-    firstName:String,
-    lastName:String,
-    email:String,
-    phoneNumber:String,
-    password:String,
-})
-const SignupModel=mongoose.model("Signup",SignupSchema)
-module.exports=SignupModel
+// const SignupSchema=new mongoose.Schema({
+//     firstName:String,
+//     lastName:String,
+//     email:String,
+//     phoneNumber:String,
+//     password:String,
+// })
+// const SignupModel=mongoose.model("Signup",SignupSchema)
+// module.exports=SignupModel
+
+
+
+
+
+
+
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+
+const SignupSchema = new mongoose.Schema({
+  firstName: String,
+  lastName: String,
+  email: { type: String, unique: true },
+  phoneNumber: String,
+  password: String,
+});
+
+// Hash password before saving user
+SignupSchema.pre('save', async function (next) {
+  if (this.isModified('password')) {
+    this.password = await bcrypt.hash(this.password, 10);
+  }
+  next();
+});
+
+module.exports = mongoose.model('Signup', SignupSchema);
+
+
+
+
+
+
+
+
+
 
 // Trip Schema
 // const mongoose = require('mongoose');
