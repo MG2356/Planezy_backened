@@ -5,6 +5,8 @@ const HotelModel = require('./Schema/Hotel');
 const CarModel = require('./Schema/Car');
 const RestaurantModel = require('./Schema/Restaurant');
 const jwt = require('jsonwebtoken');
+const CommunityModel=require("./Schema/Community");
+const mongoose = require('mongoose');
 
 const router = express.Router();
 const SECRET_KEY = 'your_secret_key';
@@ -22,6 +24,21 @@ const authenticateToken = (req, res, next) => {
     next();
   });
 };
+router.post('/createPost', authenticateToken, (req, res) => {
+  const communityData = {
+    ...req.body,
+    userId: req.userId, // Attach the authenticated user's ID
+  };
+
+  CommunityModel.create(communityData)
+    .then(CommunityData => {
+      res.json({ CommunityData });
+    })
+    .catch(err => {
+      console.log("Error during adding the place: ", err);
+      res.status(500).send('Error creating community post');
+    });
+});
 
 // Route to add flight details to an existing trip
 router.post('/addFlightToTrip', authenticateToken, async (req, res) => {
@@ -178,5 +195,29 @@ router.post('/addTrip', authenticateToken, (req, res) => {
       res.status(500).json({ error: 'Error fetching flight details' });
     }
   });
+
+  router.get('/communityPosts/:userId', async (req, res) => {
+    try {
+      const { userId } = req.params; // Get userId from request params
+  
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(400).json({ message: 'Invalid userId format' });
+      }
+  
+      // Find community posts by userId
+      const userPosts = await CommunityModel.find({ userId })
+        .populate('userId', 'firstName lastName email');
+  
+      if (userPosts.length === 0) {
+        return res.status(404).json({ message: 'No posts found for this user' });
+      }
+  
+      res.json({ userPosts });
+    } catch (error) {
+      console.error('Error fetching community posts for user:', error);
+      res.status(500).json({ message: 'Error fetching community posts for user', error: error.message });
+    }
+  });
+  
   
 module.exports = router;
