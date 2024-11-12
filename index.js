@@ -181,11 +181,36 @@ app.get('/gettrendingplace' ,(req,res)=>{
   .catch(err=>res.json(err))
 
 })
-app.get('/getUser', (req, res) => {
-  SignupModel.find({}).sort('-date') 
+// app.get('/getUser', (req, res) => {
+//   SignupModel.find({}).sort('-date') 
 
-  .then(Signup => res.json(Signup))
-  .catch(err=>res.json(err));
+//   .then(Signup => res.json(Signup))
+//   .catch(err=>res.json(err));
+// });
+app.get('/getUser', (req, res) => {
+  const userEmail = req.headers['user-email'];
+
+  if (!userEmail) {
+    return res.status(400).json({ error: 'User email is required' });
+  }
+
+  // Find the user by email
+  SignupModel.findOne({ email: userEmail })
+    .then(user => {
+      if (user) {
+        // Respond with the user data (omit the password for security)
+        const userData = {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          phoneNumber: user.phoneNumber,
+        };
+        res.json(userData);
+      } else {
+        res.status(404).json({ error: 'User not found' });
+      }
+    })
+    .catch(err => res.status(500).json({ error: 'Internal server error' }));
 });
 app.get('/recentlyViewed' ,(req,res)=>{
   PlaceModel.find({}).sort('-date') 
@@ -228,6 +253,26 @@ app.get('/place/:id', (req, res) => {
       console.log("Error during fetching the place: ", err);
       res.status(500).json({ error: "Fetching place failed" });
     });
+});
+//image 
+const imageSchema = new mongoose.Schema({
+  imageData: String
+});
+
+const Image = mongoose.model("Image", imageSchema);
+
+app.post("/upload", async (req, res) => {
+  try {
+      const { image } = req.body;
+
+      // Store image in MongoDB
+      const newImage = new Image({ imageData: image });
+      await newImage.save();
+
+      res.status(200).send("Image saved successfully");
+  } catch (error) {
+      res.status(500).send("Error saving image");
+  }
 });
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);

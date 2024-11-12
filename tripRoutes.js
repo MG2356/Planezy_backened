@@ -178,4 +178,5 @@ router.post('/addTrip', authenticateToken, (req, res) => {
       res.status(500).json({ error: 'Error fetching flight details' });
     }
   });
+  
 module.exports = router;
