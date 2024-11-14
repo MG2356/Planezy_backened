@@ -218,6 +218,34 @@ router.post('/addTrip', authenticateToken, (req, res) => {
       res.status(500).json({ message: 'Error fetching community posts for user', error: error.message });
     }
   });
-  
+  // Route to get complete trip details including all itinerary items
+router.get('/tripDetails/:tripId', authenticateToken, async (req, res) => {
+  const { tripId } = req.params;
+
+  try {
+    // Check if tripId is valid
+    if (!mongoose.Types.ObjectId.isValid(tripId)) {
+      return res.status(400).json({ error: 'Invalid Trip ID format' });
+    }
+
+    // Find the trip by ID for the logged-in user and populate all itinerary details
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId })
+      .populate('flightDetails')    // Populate flight details
+      .populate('carDetails')       // Populate car details
+      .populate('hotelDetails')     // Populate hotel details
+      .populate('restaurantDetails'); // Populate restaurant details
+
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Send the trip details with all populated itinerary data
+    res.json({ trip });
+  } catch (err) {
+    console.error("Error fetching complete trip details:", err);
+    res.status(500).json({ error: 'Error fetching complete trip details' });
+  }
+});
+
   
 module.exports = router;
