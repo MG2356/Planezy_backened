@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const RecommendedPlaceSchema = new mongoose.Schema({
+  RecommendedPlaceImage: String,
   RecommendedPlaceName: String,
   RecommendedPlaceAddress: String,
   RecommendedPlaceDescription: String,
