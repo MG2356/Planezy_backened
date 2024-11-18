@@ -4,6 +4,10 @@ const FlightModel = require('./Schema/Flight');
 const HotelModel = require('./Schema/Hotel');
 const CarModel = require('./Schema/Car');
 const RestaurantModel = require('./Schema/Restaurant');
+const MeetingModel = require('./Schema/Meeting');
+const RailModel = require('./Schema/Rail');
+const ActivityModel = require('./Schema/Activity');
+
 const jwt = require('jsonwebtoken');
 const CommunityModel=require("./Schema/Community");
 const mongoose = require('mongoose');
@@ -136,6 +140,78 @@ router.post('/addCarToTrip', authenticateToken, async (req, res) => {
       res.status(500).json({ error: 'Error adding hotel details' });
     }
   });
+//Meeting 
+router.post('/addMeetingToTrip', authenticateToken, async (req, res) => {
+  const { tripId, meetingDetails } = req.body;
+
+  if (!tripId || !meetingDetails) {
+    return res.status(400).json({ error: 'Trip ID and restaurant details are required' });
+  }
+
+  try {
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+
+    const meeting = new MeetingModel({ ...meetingDetails, tripId });
+    await meeting.save();
+
+    trip.meetingDetails = meeting._id;
+    await trip.save();
+
+    res.json({ message: 'meeting Details added to the trip successfully', trip });
+  } catch (err) {
+    console.error("Error adding meeting details: ", err);
+    res.status(500).json({ error: 'Error adding meeting details' });
+  }
+});
+//Rail
+router.post('/addRailToTrip', authenticateToken, async (req, res) => {
+  const { tripId, railDetails } = req.body;
+
+  if (!tripId || !railDetails) {
+    return res.status(400).json({ error: 'Trip ID and restaurant details are required' });
+  }
+
+  try {
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+
+    const rail = new RailModel({ ...railDetails, tripId });
+    await rail.save();
+
+    trip.railDetails = rail._id;
+    await trip.save();
+
+    res.json({ message: 'rail Details added to the trip successfully', trip });
+  } catch (err) {
+    console.error("Error adding rail details: ", err);
+    res.status(500).json({ error: 'Error adding rail details' });
+  }
+});
+//Acitivity
+router.post('/addActivityToTrip', authenticateToken, async (req, res) => {
+  const { tripId, activityDetails } = req.body;
+
+  if (!tripId || !activityDetails) {
+    return res.status(400).json({ error: 'Trip ID and restaurant details are required' });
+  }
+
+  try {
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+
+    const activity = new ActivityModel({ ...activityDetails, tripId });
+    await activity.save();
+
+    trip.activityDetails = activity._id;
+    await trip.save();
+
+    res.json({ message: 'activity Details added to the trip successfully', trip });
+  } catch (err) {
+    console.error("Error adding activity details: ", err);
+    res.status(500).json({ error: 'Error adding activity details' });
+  }
+});
 
 // Add Hotel, Car, Restaurant similar to above route...
 router.post('/addTrip', authenticateToken, (req, res) => {
@@ -233,8 +309,10 @@ router.get('/tripDetails/:tripId', authenticateToken, async (req, res) => {
       .populate('flightDetails')    // Populate flight details
       .populate('carDetails')       // Populate car details
       .populate('hotelDetails')     // Populate hotel details
-      .populate('restaurantDetails'); // Populate restaurant details
-
+      .populate('restaurantDetails') // Populate restaurant details
+      .populate('meetingDetails')
+      .populate('railDetails')
+      .populate('activityDetails');
     if (!trip) {
       return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
     }
