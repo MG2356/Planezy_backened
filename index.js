@@ -1,57 +1,100 @@
 const express = require("express");
-const mongoose = require('mongoose');
-const SignupModel = require("./Schema/Signup");
-const PlaceModel = require("./Schema/Place")
-const CommunityModel=require("./Schema/Community");
-const TrendingPlaceModel=require("./Schema/TrendingPlace")
-const RecommendedPlaceModel=require("./Schema/RecommendedPlace")
-const TripModel=require("./Schema/Trip")
+const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const PORT = process.env.PORT||8000;
-const tripRoutes = require('./tripRoutes');
-
-const app = express();
-dotenv.config();
-const SECRET_KEY = 'your_secret_key';
-
+const nodemailer = require("nodemailer");
 const cors = require("cors");
-const corsOptions = {
-  origin: "*",
-  credentials: true, //access-control-allow-credentials:true
-  optionSuccessStatus: 200,
-};
+const SignupModel = require("./Schema/Signup");
+const PlaceModel = require("./Schema/Place");
+const CommunityModel = require("./Schema/Community");
+const TrendingPlaceModel = require("./Schema/TrendingPlace");
+const RecommendedPlaceModel = require("./Schema/RecommendedPlace");
+const TripModel = require("./Schema/Trip");
+const tripRoutes = require("./tripRoutes");
 
-app.use(cors());
+dotenv.config();
+const app = express();
+const PORT = process.env.PORT || 8000;
+const SECRET_KEY = "your_secret_key";
+
+app.use(cors({ origin: "*", credentials: true, optionSuccessStatus: 200 }));
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send('Website Working');
+mongoose
+  .connect(
+    "mongodb+srv://munishgoel45698:9r3jwSuO1CzegsfD@cluster0.9r9br1c.mongodb.net/PlanEzy",
+    { useNewUrlParser: true, useUnifiedTopology: true }
+  )
+  .then(() => console.log("Connected to DB"))
+  .catch((err) => console.log("Error connecting to DB:", err));
+
+app.get("/", (req, res) => res.send("Website Working"));
+
+// Configure Nodemailer
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL, // Your email
+    pass: process.env.EMAIL_PASSWORD, // Your email app password
+  },
 });
 
-// Connect to the database
-mongoose.connect('mongodb+srv://munishgoel45698:9r3jwSuO1CzegsfD@cluster0.9r9br1c.mongodb.net/PlanEzy', { useNewUrlParser: true, useUnifiedTopology: true })
-.then(() => console.log("connected to db"))
-.catch(err => console.log("Error connecting to db: ", err));
-
-// Routes
-// Middleware for Authentication
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if (!token) return res.sendStatus(401);  // Unauthorized if no token is found
-
-  jwt.verify(token, SECRET_KEY, (err, decoded) => {
-    if (err) return res.sendStatus(403);  // Forbidden if token is invalid
-    req.userId = decoded.userId;
-    next();
-  });
-};
-
-
 // User registration
+// app.post("/Register", async (req, res) => {
+//   try {
+//     const hashedPassword = await bcrypt.hash(req.body.password, 10);
+//     const user = new SignupModel({ ...req.body, password: hashedPassword });
+//     await user.save();
+//     res.status(201).json({ message: "User created successfully" });
+//   } catch (err) {
+//     console.error("Error during user signup:", err);
+//     res.status(500).json({ error: "User signup failed" });
+//   }
+// });
+
+// // User login with OTP
+// app.post("/login", async (req, res) => {
+//   const { email, password } = req.body;
+
+//   try {
+//     const user = await SignupModel.findOne({ email });
+//     if (!user || !(await bcrypt.compare(password, user.password))) {
+//       return res.status(401).json({ message: "Invalid credentials" });
+//     }
+
+//     // Generate a 6-digit OTP
+//     const otp = Math.floor(100000 + Math.random() * 900000);
+
+//     // Send OTP via email
+//     const mailOptions = {
+//       from: process.env.EMAIL,
+//       to: email,
+//       subject: "Your OTP for Login",
+//       text: `Your OTP for login is: ${otp}. It will expire in 10 minutes.`,
+//     };
+
+//     transporter.sendMail(mailOptions, async (err, info) => {
+//       if (err) {
+//         console.error("Error sending OTP email:", err);
+//         return res.status(500).json({ message: "Error sending OTP email" });
+//       }
+
+//       console.log("OTP email sent:", info.response);
+
+//       // Save the OTP in the database
+//       user.otp = otp;
+//       user.otpExpires = Date.now() + 10 * 60 * 1000; // OTP valid for 10 minutes
+//       await user.save();
+
+//       res.json({ message: "OTP sent successfully" });
+//     });
+//   } catch (err) {
+//     console.error("Error during user login:", err);
+//     res.status(500).json({ error: "User login failed" });
+//   }
+// });
+// User Registration
 app.post('/Register',async (req, res) => {
   try {
     const user = new SignupModel(req.body);
@@ -63,35 +106,106 @@ app.post('/Register',async (req, res) => {
   }
 });
 
-// User login
-app.post("/login", async(req, res) => {
+// User Login with OTP
+app.post("/login", async (req, res) => {
   const { email, password } = req.body;
+
   try {
     const user = await SignupModel.findOne({ email });
     if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const token = jwt.sign({ userId: user._id }, SECRET_KEY, { expiresIn: '1h' });
-    res.json({ token });
+    // Generate a 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000);
+
+    // Send OTP via email
+    const mailOptions = {
+      from: process.env.EMAIL,
+      to: email,
+      subject: " Your OTP for Login",
+      text: `
+         
+Dear User,
+
+This is your One-Time Password (OTP) for login:${otp}
+
+Please do not share this OTP with anyone.
+It will expire in 5 minutes.
+
+Note: This is an auto-generated email. Please do not reply to this message.
+
+Thank you for using 
+PlanEzy
+(Happy Planning 😊)
+      `,
+    };
+
+    transporter.sendMail(mailOptions, async (err, info) => {
+      if (err) {
+        console.error("Error sending OTP email:", err);
+        return res.status(500).json({ message: "Error sending OTP email" });
+      }
+
+      console.log("OTP email sent:", info.response);
+
+      // Save OTP and expiration in the user document
+      user.otp = otp;
+      user.otpExpires = Date.now() + 10 * 60 * 1000; // OTP valid for 10 minutes
+      await user.save();
+
+      res.json({ message: "OTP sent successfully" });
+    });
   } catch (err) {
     console.error("Error during user login:", err);
     res.status(500).json({ error: "User login failed" });
   }
 });
-//place add 
 
-app.post('/addplace', (req, res) => {
-  PlaceModel.create(req.body)
-    .then(place => {
-      res.json({ place });
-    })
-    .catch(err => {
-      console.log("Error during adding the place: ", err);
-    });
+
+// Verify OTP
+app.post("/verify-otp", async (req, res) => {
+  const { email, otp } = req.body;
+
+  try {
+    const user = await SignupModel.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (!user.otp || user.otpExpires < Date.now()) {
+      return res.status(400).json({ message: "OTP expired or not found" });
+    }
+
+    if (user.otp !== otp) {
+      return res.status(401).json({ message: "Invalid OTP" });
+    }
+
+    // Clear OTP after successful verification
+    user.otp = undefined;
+    user.otpExpires = undefined;
+    await user.save();
+
+    // Generate JWT token
+    const token = jwt.sign({ userId: user._id }, SECRET_KEY, { expiresIn: "1h" });
+    res.json({ message: "OTP verified successfully", token });
+  } catch (err) {
+    console.error("Error during OTP verification:", err);
+    res.status(500).json({ error: "OTP verification failed" });
+  }
 });
-//create trending place 
 
+// Other routes...
+// Add Place
+app.post("/addplace", async (req, res) => {
+  try {
+    const place = await PlaceModel.create(req.body);
+    res.json({ place });
+  } catch (err) {
+    console.error("Error during adding the place:", err);
+    res.status(500).json({ error: "Adding place failed" });
+  }
+});
 app.post('/addtrendingplace', (req, res) => {
   TrendingPlaceModel.create(req.body)
     .then(trendingplace => {
@@ -102,7 +216,7 @@ app.post('/addtrendingplace', (req, res) => {
     });
 });
 
-  app.use('/trip', tripRoutes);
+  // app.use('/trip', tripRoutes);
 
 
 // craete recommended trip
@@ -158,16 +272,15 @@ app.delete('/deleteplace/:id', (req, res) => {
 });
 
 
-
-// get place
-app.get('/getplace' ,(req,res)=>{
-  PlaceModel.find({}).sort('-date') 
-
-  .then(place => res.json(place))
-  .catch(err=>res.json(err))
-
-})
-//get recommended place 
+// Get Places
+app.get("/getplace", async (req, res) => {
+  try {
+    const places = await PlaceModel.find({}).sort("-date");
+    res.json(places);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
 app.get('/getrecommended' ,(req,res)=>{
   RecommendedPlaceModel.find({}).sort('-date') 
   .then(place => res.json(place))
@@ -254,26 +367,9 @@ app.get('/place/:id', (req, res) => {
       res.status(500).json({ error: "Fetching place failed" });
     });
 });
-//image 
-const imageSchema = new mongoose.Schema({
-  imageData: String
-});
+app.use('/trip', tripRoutes);
 
-const Image = mongoose.model("Image", imageSchema);
-
-app.post("/upload", async (req, res) => {
-  try {
-      const { image } = req.body;
-
-      // Store image in MongoDB
-      const newImage = new Image({ imageData: image });
-      await newImage.save();
-
-      res.status(200).send("Image saved successfully");
-  } catch (error) {
-      res.status(500).send("Error saving image");
-  }
-});
+// Start Server
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });

@@ -325,5 +325,43 @@ router.get('/tripDetails/:tripId', authenticateToken, async (req, res) => {
   }
 });
 
-  
+  // API to delete a trip
+router.delete('/deleteTrip/:tripId', authenticateToken, async (req, res) => {
+  const { tripId } = req.params;
+
+  try {
+    // Validate Trip ID format
+    if (!mongoose.Types.ObjectId.isValid(tripId)) {
+      return res.status(400).json({ error: 'Invalid Trip ID format' });
+    }
+
+    // Find the trip by ID and ensure it belongs to the authenticated user
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Delete associated itinerary details
+    const deletePromises = [];
+    if (trip.flightDetails) deletePromises.push(FlightModel.findByIdAndDelete(trip.flightDetails));
+    if (trip.carDetails) deletePromises.push(CarModel.findByIdAndDelete(trip.carDetails));
+    if (trip.hotelDetails) deletePromises.push(HotelModel.findByIdAndDelete(trip.hotelDetails));
+    if (trip.restaurantDetails) deletePromises.push(RestaurantModel.findByIdAndDelete(trip.restaurantDetails));
+    if (trip.meetingDetails) deletePromises.push(MeetingModel.findByIdAndDelete(trip.meetingDetails));
+    if (trip.railDetails) deletePromises.push(RailModel.findByIdAndDelete(trip.railDetails));
+    if (trip.activityDetails) deletePromises.push(ActivityModel.findByIdAndDelete(trip.activityDetails));
+
+    await Promise.all(deletePromises);
+
+    // Delete the trip itself
+    await TripModel.findByIdAndDelete(tripId);
+
+    res.json({ message: 'Trip and associated details deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting trip:', err);
+    res.status(500).json({ error: 'Error deleting trip' });
+  }
+});
+
 module.exports = router;

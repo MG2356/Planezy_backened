@@ -19,14 +19,24 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
+// const SignupSchema = new mongoose.Schema({
+//   firstName: String,
+//   lastName: String,
+//   email: { type: String, unique: true },
+//   phoneNumber: String,
+//   password: String,
+//   otp: { type: String, default: null },
+//   otpExpires: { type: Date, default: null },
+// });
 const SignupSchema = new mongoose.Schema({
   firstName: String,
   lastName: String,
-  email: { type: String, unique: true },
-  phoneNumber: String,
+  email: String,
   password: String,
+  phoneNumber: String,
+  otp: String,
+  otpExpires: Date,
 });
-
 // Hash password before saving user
 SignupSchema.pre('save', async function (next) {
   if (this.isModified('password')) {
