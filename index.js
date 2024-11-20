@@ -256,14 +256,47 @@ app.post('/createPost', (req, res) => {
     });
 });
 //support
-app.post('/contact',async (req, res) => {
+// app.post('/contact',async (req, res) => {
+//   try {
+//     const contact = new ContactModel(req.body);
+//     await contact.save();
+//     res.status(201).json({ message: " Submitted successfully" });
+//   } catch (err) {
+//     console.error("Error during user signup:", err);
+//     res.status(500).json({ error: "Not Submitted" });
+//   }
+// });
+
+
+// Function to send email
+
+const sendThankYouEmail = (userEmail, userName) => {
+  const mailOptions = {
+    from: 'munishgoel45698@gmail.com', // Replace with your email address
+    to: userEmail,
+    subject: `Thank you for contacting us, ${userName}!`,
+    subject: `Thank you for contacting us, ${userName}!`,
+    text: `Dear ${userName},\n\nThank you for reaching out to us. We have received your message and will get back to you soon. We appreciate your interest and look forward to assisting you.\n\nBest regards,\nPlanEzy Team`,
+  };
+
+  // Send email using Nodemailer transport
+  return transporter.sendMail(mailOptions);
+};
+
+app.post('/contact', async (req, res) => {
   try {
+    // Save the contact data into the MongoDB database
     const contact = new ContactModel(req.body);
     await contact.save();
-    res.status(201).json({ message: " Submitted successfully" });
+
+    // Send a thank you email to the user
+    await sendThankYouEmail(req.body.Email, req.body.FullName);
+
+    // Respond with a success message
+    res.status(201).json({ message: 'Submitted successfully, thank you!' });
   } catch (err) {
-    console.error("Error during user signup:", err);
-    res.status(500).json({ error: "Not Submitted" });
+    console.error('Error during submission:', err);
+    res.status(500).json({ error: 'Submission failed, please try again.' });
   }
 });
 // Update place by ID
