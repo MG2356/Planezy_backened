@@ -121,7 +121,7 @@ app.post("/Login", async(req, res) => {
   }
 });
 // User Login with OTP
-app.post("/login", async (req, res) => {
+app.post("/mglogin", async (req, res) => {
   const { email, password } = req.body;
 
   try {
@@ -140,18 +140,18 @@ app.post("/login", async (req, res) => {
       subject: " Your OTP for Login",
       text: `
          
-Dear User,
+      Dear User,
 
-This is your One-Time Password (OTP) for login:${otp}
+      This is your One-Time Password (OTP) for login:${otp}
 
-Please do not share this OTP with anyone.
-It will expire in 5 minutes.
+      Please do not share this OTP with anyone.
+      It will expire in 5 minutes.
 
-Note: This is an auto-generated email. Please do not reply to this message.
+      Note: This is an auto-generated email. Please do not reply to this message.
 
-Thank you for using 
-PlanEzy
-(Happy Planning 😊)
+      Thank you for using 
+      PlanEzy
+      (Happy Planning 😊)
       `,
     };
 
