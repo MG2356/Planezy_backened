@@ -16,8 +16,7 @@
 
 
 
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+
 
 // const SignupSchema = new mongoose.Schema({
 //   firstName: String,
@@ -28,6 +27,8 @@ const bcrypt = require('bcrypt');
 //   otp: { type: String, default: null },
 //   otpExpires: { type: Date, default: null },
 // });
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 const SignupSchema = new mongoose.Schema({
   firstName: String,
   lastName: String,

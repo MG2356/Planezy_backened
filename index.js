@@ -287,6 +287,14 @@ app.delete('/deleteplace/:id', (req, res) => {
 
 
 // Get Places
+app.get("/getcommunity", async (req, res) => {
+  try {
+    const community = await CommunityModel.find({}).sort("-date");
+    res.json(community);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
 app.get("/getplace", async (req, res) => {
   try {
     const places = await PlaceModel.find({}).sort("-date");
