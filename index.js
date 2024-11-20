@@ -12,7 +12,7 @@ const TrendingPlaceModel = require("./Schema/TrendingPlace");
 const RecommendedPlaceModel = require("./Schema/RecommendedPlace");
 const TripModel = require("./Schema/Trip");
 const tripRoutes = require("./tripRoutes");
-
+const ContactModel=require("./Schema/ContactSupport")
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -120,6 +120,7 @@ app.post("/Login", async(req, res) => {
     res.status(500).json({ error: "User login failed" });
   }
 });
+
 // User Login with OTP
 app.post("/mglogin", async (req, res) => {
   const { email, password } = req.body;
@@ -140,18 +141,18 @@ app.post("/mglogin", async (req, res) => {
       subject: " Your OTP for Login",
       text: `
          
-      Dear User,
+    Dear User,
 
-      This is your One-Time Password (OTP) for login:${otp}
+    This is your One-Time Password (OTP) for login:${otp}
 
-      Please do not share this OTP with anyone.
-      It will expire in 5 minutes.
+    Please do not share this OTP with anyone.
+    It will expire in 5 minutes.
 
-      Note: This is an auto-generated email. Please do not reply to this message.
+    Note: This is an auto-generated email. Please do not reply to this message.
 
-      Thank you for using 
-      PlanEzy
-      (Happy Planning 😊)
+    Thank you for using our App
+    PlanEzy Team
+    Happy Planning 😊
       `,
     };
 
@@ -253,6 +254,17 @@ app.post('/createPost', (req, res) => {
     .catch(err => {
       console.log("Error during adding the place: ", err);
     });
+});
+//support
+app.post('/contact',async (req, res) => {
+  try {
+    const contact = new ContactModel(req.body);
+    await contact.save();
+    res.status(201).json({ message: " Submitted successfully" });
+  } catch (err) {
+    console.error("Error during user signup:", err);
+    res.status(500).json({ error: "Not Submitted" });
+  }
 });
 // Update place by ID
 app.put('/updateplace/:id', (req, res) => {
