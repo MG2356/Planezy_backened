@@ -105,7 +105,21 @@ app.post('/Register',async (req, res) => {
     res.status(500).json({ error: "User signup failed" });
   }
 });
+app.post("/Login", async(req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await SignupModel.findOne({ email });
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
 
+    const token = jwt.sign({ userId: user._id }, SECRET_KEY, { expiresIn: '1h' });
+    res.json({ token });
+  } catch (err) {
+    console.error("Error during user login:", err);
+    res.status(500).json({ error: "User login failed" });
+  }
+});
 // User Login with OTP
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
