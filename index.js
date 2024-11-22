@@ -49,6 +49,38 @@ app.post('/saveRecentlyViewed', async (req, res) => {
       res.status(500).json({ message: 'Error saving recently viewed place', error });
   }
 });
+//fav
+
+const FavoritePlaceSchema = new mongoose.Schema({
+  userId: String, // Optional: For user-specific functionality
+  RecommendedPlaceImage: String,
+  RecommendedPlaceName: String,
+  RecommendedPlaceAddress: String,
+  RecommendedPlaceDescription: String,
+  RecommendedPlaceCategory: String,
+  RecommendedPlaceRating: Number,
+  addedAt: { type: Date, default: Date.now },
+});
+
+// Model for Favorite Place
+const FavoritePlaceModel = mongoose.model('FavoritePlace', FavoritePlaceSchema);
+
+// POST API to Save Favorite Place
+app.post('/saveFavorite', async (req, res) => {
+  try {
+      const favoritePlace = new FavoritePlaceModel(req.body);
+      await favoritePlace.save();
+      res.status(201).json({ message: 'Favorite place saved successfully!' });
+  } catch (error) {
+      res.status(500).json({ message: 'Error saving favorite place', error });
+  }
+});
+
+
+
+
+
+
 
 // User registration
 // app.post("/Register", async (req, res) => {
