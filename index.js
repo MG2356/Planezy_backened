@@ -17,7 +17,6 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 8000;
 const SECRET_KEY = "your_secret_key";
-const RecentlyViewedModel=require("./Schema/RecentlyViewed")
 app.use(cors({ origin: "*", credentials: true, optionSuccessStatus: 200 }));
 app.use(express.json());
 
@@ -40,38 +39,42 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-app.post('/saveRecentlyViewed', async (req, res) => {
-  try {
-      const recentlyViewed = new RecentlyViewedModel(req.body);
-      await recentlyViewed.save();
-      res.status(201).json({ message: 'Recently viewed place saved successfully!' });
-  } catch (error) {
-      res.status(500).json({ message: 'Error saving recently viewed place', error });
-  }
-});
+
 //fav
 
-const FavoritePlaceSchema = new mongoose.Schema({
-  userId: String, // Optional: For user-specific functionality
+const PlaceSchema = new mongoose.Schema({
   RecommendedPlaceImage: String,
   RecommendedPlaceName: String,
   RecommendedPlaceAddress: String,
   RecommendedPlaceDescription: String,
   RecommendedPlaceCategory: String,
   RecommendedPlaceRating: Number,
-  addedAt: { type: Date, default: Date.now },
 });
 
-// Model for Favorite Place
-const FavoritePlaceModel = mongoose.model('FavoritePlace', FavoritePlaceSchema);
+const RecentlyViewedModel = mongoose.model('RecentlyViewed', PlaceSchema);
+const FavoriteModel = mongoose.model('Favorite', PlaceSchema);;
 
 // POST API to Save Favorite Place
+// Save Recently Viewed
+app.post('/saveRecentlyViewed', async (req, res) => {
+  try {
+      const recentlyViewed = new RecentlyViewedModel(req.body);
+      await recentlyViewed.save();
+      res.status(201).json({ message: 'Recently viewed place saved successfully!' });
+  } catch (error) {
+      console.error("Error saving recently viewed:", error);
+      res.status(500).json({ message: 'Error saving recently viewed place', error });
+  }
+});
+
+// Save to Favorites
 app.post('/saveFavorite', async (req, res) => {
   try {
-      const favoritePlace = new FavoritePlaceModel(req.body);
-      await favoritePlace.save();
+      const favorite = new FavoriteModel(req.body);
+      await favorite.save();
       res.status(201).json({ message: 'Favorite place saved successfully!' });
   } catch (error) {
+      console.error("Error saving favorite:", error);
       res.status(500).json({ message: 'Error saving favorite place', error });
   }
 });
