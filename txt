@@ -219,3 +219,359 @@
 
 
 }
+
+
+[
+    {
+      "placeName": "Kedarkantha Trek",
+      "communityCategory": "Trek Triumphs",
+      "visitedLocation": "Uttarakhand",
+      "duration": 6,
+      "tripExperience": "An unforgettable trekking experience through snowy landscapes and beautiful mountain vistas."
+    },
+    {
+      "placeName": "Manali Solo Trip",
+      "communityCategory": "Solo Explorers",
+      "visitedLocation": "Himachal Pradesh",
+      "duration": 4,
+      "tripExperience": "Explored the serene beauty of Manali and experienced solitude amidst the mountains."
+    },
+    {
+      "placeName": "Leh-Ladakh Road Trip",
+      "communityCategory": "Road Trip Lovers",
+      "visitedLocation": "Jammu & Kashmir",
+      "duration": 10,
+      "tripExperience": "An adventurous road trip with breathtaking views and high-altitude passes."
+    },
+    {
+      "placeName": "Goa Beach Escape",
+      "communityCategory": "Budget Backpackers",
+      "visitedLocation": "Goa",
+      "duration": 3,
+      "tripExperience": "Enjoyed vibrant beaches and affordable nightlife on a shoestring budget."
+    },
+    {
+      "placeName": "Hampi Heritage Tour",
+      "communityCategory": "Historic Horizons",
+      "visitedLocation": "Karnataka",
+      "duration": 2,
+      "tripExperience": "Explored the ancient ruins of Hampi, a UNESCO World Heritage Site."
+    },
+    {
+      "placeName": "Udaipur Luxury Retreat",
+      "communityCategory": "Luxe Ventures",
+      "visitedLocation": "Rajasthan",
+      "duration": 5,
+      "tripExperience": "Stayed at a royal palace and experienced the regal charm of Rajasthan."
+    },
+    {
+      "placeName": "Jaipur Family Vacation",
+      "communityCategory": "Family Funtastic",
+      "visitedLocation": "Rajasthan",
+      "duration": 4,
+      "tripExperience": "Explored the Pink City with family and enjoyed the vibrant culture and architecture."
+    },
+    {
+      "placeName": "Mumbai Urban Escape",
+      "communityCategory": "Urban Odyssey",
+      "visitedLocation": "Maharashtra",
+      "duration": 3,
+      "tripExperience": "Experienced the hustle and bustle of Mumbai with a mix of modernity and heritage."
+    },
+    {
+      "placeName": "Rishikesh Spiritual Journey",
+      "communityCategory": "Spiritual Seekers",
+      "visitedLocation": "Uttarakhand",
+      "duration": 5,
+      "tripExperience": "Found peace in the ashrams and enjoyed yoga sessions by the Ganges."
+    },
+    {
+      "placeName": "Varanasi Cultural Exploration",
+      "communityCategory": "Wanderlust Scholars",
+      "visitedLocation": "Uttar Pradesh",
+      "duration": 4,
+      "tripExperience": "Delved into the spiritual and cultural significance of India's oldest living city."
+    },
+    {
+        "placeName": "Triund Trek",
+        "communityCategory": "Trek Triumphs",
+        "visitedLocation": "Himachal Pradesh",
+        "duration": 2,
+        "tripExperience": "A short yet rewarding trek offering panoramic views of the Dhauladhar range."
+      },
+      {
+        "placeName": "Kumara Parvatha Trek",
+        "communityCategory": "Trek Triumphs",
+        "visitedLocation": "Karnataka",
+        "duration": 2,
+        "tripExperience": "An exhilarating trek through lush greenery and challenging trails."
+      },
+      {
+        "placeName": "Kasol-Solo Journey",
+        "communityCategory": "Solo Explorers",
+        "visitedLocation": "Himachal Pradesh",
+        "duration": 3,
+        "tripExperience": "Relaxed by the Parvati River and explored the hippie culture of Kasol."
+      },
+      {
+        "placeName": "Pondicherry Backpacking",
+        "communityCategory": "Budget Backpackers",
+        "visitedLocation": "Puducherry",
+        "duration": 2,
+        "tripExperience": "Enjoyed French-inspired architecture and budget-friendly cafes."
+      },
+      {
+        "placeName": "Konark Sun Temple",
+        "communityCategory": "Historic Horizons",
+        "visitedLocation": "Odisha",
+        "duration": 1,
+        "tripExperience": "Admired the architectural brilliance of this UNESCO World Heritage Site."
+      },
+      {
+        "placeName": "Andaman Luxury Getaway",
+        "communityCategory": "Luxe Ventures",
+        "visitedLocation": "Andaman & Nicobar Islands",
+        "duration": 7,
+        "tripExperience": "Indulged in pristine beaches and luxury water villas."
+      },
+      {
+        "placeName": "Coorg Coffee Trails",
+        "communityCategory": "Family Funtastic",
+        "visitedLocation": "Karnataka",
+        "duration": 3,
+        "tripExperience": "Spent quality family time amidst coffee plantations and serene landscapes."
+      },
+      {
+        "placeName": "Bangalore City Tour",
+        "communityCategory": "Urban Odyssey",
+        "visitedLocation": "Karnataka",
+        "duration": 2,
+        "tripExperience": "Explored tech hubs, gardens, and vibrant nightlife."
+      },
+      {
+        "placeName": "Amritsar Golden Temple Visit",
+        "communityCategory": "Spiritual Seekers",
+        "visitedLocation": "Punjab",
+        "duration": 1,
+        "tripExperience": "Experienced spiritual bliss at the Golden Temple and participated in Langar."
+      },
+      {
+        "placeName": "Kolkata Cultural Tour",
+        "communityCategory": "Wanderlust Scholars",
+        "visitedLocation": "West Bengal",
+        "duration": 3,
+        "tripExperience": "Dove into art, literature, and delicious Bengali cuisine."
+      },
+      {
+        "placeName": "Chopta Trek",
+        "communityCategory": "Trek Triumphs",
+        "visitedLocation": "Uttarakhand",
+        "duration": 3,
+        "tripExperience": "Trek to Tungnath and Chandrashila for an unforgettable Himalayan experience."
+      },
+      {
+        "placeName": "Darjeeling Solo Escape",
+        "communityCategory": "Solo Explorers",
+        "visitedLocation": "West Bengal",
+        "duration": 4,
+        "tripExperience": "Sipped Darjeeling tea and enjoyed the sunrise at Tiger Hill."
+      },
+      {
+        "placeName": "Delhi to Agra Road Trip",
+        "communityCategory": "Road Trip Lovers",
+        "visitedLocation": "Uttar Pradesh",
+        "duration": 2,
+        "tripExperience": "Drove along the Yamuna Expressway to witness the magnificent Taj Mahal."
+      },
+      {
+        "placeName": "Ranthambore Safari",
+        "communityCategory": "Budget Backpackers",
+        "visitedLocation": "Rajasthan",
+        "duration": 2,
+        "tripExperience": "Spotted tigers and other wildlife on a budget-friendly adventure."
+      },
+      {
+        "placeName": "Khajuraho Temples",
+        "communityCategory": "Historic Horizons",
+        "visitedLocation": "Madhya Pradesh",
+        "duration": 2,
+        "tripExperience": "Explored intricate carvings and historical wonders at Khajuraho."
+      },
+      {
+        "placeName": "Jaipur Heritage Hotels",
+        "communityCategory": "Luxe Ventures",
+        "visitedLocation": "Rajasthan",
+        "duration": 5,
+        "tripExperience": "Stayed in a heritage hotel and dined like royalty."
+      },
+      {
+        "placeName": "Alleppey Houseboat Experience",
+        "communityCategory": "Family Funtastic",
+        "visitedLocation": "Kerala",
+        "duration": 3,
+        "tripExperience": "Enjoyed a relaxing houseboat ride through Kerala’s tranquil backwaters."
+      },
+      {
+        "placeName": "Hyderabad Food Crawl",
+        "communityCategory": "Urban Odyssey",
+        "visitedLocation": "Telangana",
+        "duration": 2,
+        "tripExperience": "Tasted iconic Hyderabadi Biryani and other culinary delights."
+      },
+      {
+        "placeName": "Haridwar Ganga Aarti",
+        "communityCategory": "Spiritual Seekers",
+        "visitedLocation": "Uttarakhand",
+        "duration": 2,
+        "tripExperience": "Attended the mesmerizing evening Aarti at Har Ki Pauri."
+      },
+      {
+        "placeName": "Bhubaneswar Temples",
+        "communityCategory": "Wanderlust Scholars",
+        "visitedLocation": "Odisha",
+        "duration": 2,
+        "tripExperience": "Explored the rich temple architecture and spiritual significance."
+      },
+      {
+        "placeName": "Valley of Flowers Trek",
+        "communityCategory": "Trek Triumphs",
+        "visitedLocation": "Uttarakhand",
+        "duration": 6,
+        "tripExperience": "Witnessed vibrant floral meadows and breathtaking landscapes."
+      },
+      {
+        "placeName": "Spiti Valley Trek",
+        "communityCategory": "Trek Triumphs",
+        "visitedLocation": "Himachal Pradesh",
+        "duration": 9,
+        "tripExperience": "A challenging trek with surreal views of barren mountains."
+      },
+      {
+        "placeName": "Shillong Solo Adventure",
+        "communityCategory": "Solo Explorers",
+        "visitedLocation": "Meghalaya",
+        "duration": 5,
+        "tripExperience": "Explored waterfalls, caves, and the vibrant culture of Shillong."
+      },
+      {
+        "placeName": "Mysore Road Trip",
+        "communityCategory": "Road Trip Lovers",
+        "visitedLocation": "Karnataka",
+        "duration": 2,
+        "tripExperience": "A scenic drive to explore Mysore’s palaces and gardens."
+      },
+      {
+        "placeName": "Gokarna Budget Retreat",
+        "communityCategory": "Budget Backpackers",
+        "visitedLocation": "Karnataka",
+        "duration": 3,
+        "tripExperience": "Relaxed on pristine beaches with budget accommodations."
+      },
+      {
+        "placeName": "Mahabalipuram Heritage Visit",
+        "communityCategory": "Historic Horizons",
+        "visitedLocation": "Tamil Nadu",
+        "duration": 2,
+        "tripExperience": "Admired rock-cut sculptures and ancient temples by the sea."
+      },
+      {
+        "placeName": "Kumarakom Luxury Escape",
+        "communityCategory": "Luxe Ventures",
+        "visitedLocation": "Kerala",
+        "duration": 5,
+        "tripExperience": "Indulged in a luxurious resort surrounded by serene backwaters."
+      },
+      {
+        "placeName": "Rameswaram Family Pilgrimage",
+        "communityCategory": "Family Funtastic",
+        "visitedLocation": "Tamil Nadu",
+        "duration": 3,
+        "tripExperience": "Visited iconic temples and enjoyed time with family."
+      },
+      {
+        "placeName": "Chennai Urban Discovery",
+        "communityCategory": "Urban Odyssey",
+        "visitedLocation": "Tamil Nadu",
+        "duration": 2,
+        "tripExperience": "Explored Marina Beach and the rich cultural vibes of Chennai."
+      },
+      {
+        "placeName": "Pushkar Camel Fair",
+        "communityCategory": "Wanderlust Scholars",
+        "visitedLocation": "Rajasthan",
+        "duration": 3,
+        "tripExperience": "Immersed in the vibrant atmosphere of the annual Pushkar fair."
+      },
+      {
+        "placeName": "Nandi Hills Trek",
+        "communityCategory": "Trek Triumphs",
+        "visitedLocation": "Karnataka",
+        "duration": 1,
+        "tripExperience": "A quick hike with rewarding sunrise views over Bangalore."
+      },
+      {
+        "placeName": "Auroville Solo Retreat",
+        "communityCategory": "Solo Explorers",
+        "visitedLocation": "Puducherry",
+        "duration": 3,
+        "tripExperience": "Found tranquility in Auroville's serene and spiritual ambiance."
+      },
+      {
+        "placeName": "Coimbatore to Ooty Drive",
+        "communityCategory": "Road Trip Lovers",
+        "visitedLocation": "Tamil Nadu",
+        "duration": 2,
+        "tripExperience": "A picturesque drive with hairpin bends leading to Ooty's cool weather."
+      },
+      {
+        "placeName": "Rishikesh Budget Adventure",
+        "communityCategory": "Budget Backpackers",
+        "visitedLocation": "Uttarakhand",
+        "duration": 3,
+        "tripExperience": "Tried river rafting and camping by the Ganges at an affordable cost."
+      },
+      {
+        "placeName": "Ajanta and Ellora Caves",
+        "communityCategory": "Historic Horizons",
+        "visitedLocation": "Maharashtra",
+        "duration": 3,
+        "tripExperience": "Explored centuries-old cave temples carved into solid rock."
+      },
+      {
+        "placeName": "Neemrana Fort Stay",
+        "communityCategory": "Luxe Ventures",
+        "visitedLocation": "Rajasthan",
+        "duration": 2,
+        "tripExperience": "Enjoyed a royal stay with panoramic views and fine dining."
+      },
+      {
+        "placeName": "Kochi Family Holiday",
+        "communityCategory": "Family Funtastic",
+        "visitedLocation": "Kerala",
+        "duration": 3,
+        "tripExperience": "Visited Fort Kochi, Jew Town, and enjoyed Kerala's authentic cuisine."
+      },
+      {
+        "placeName": "Ahmedabad City Tour",
+        "communityCategory": "Urban Odyssey",
+        "visitedLocation": "Gujarat",
+        "duration": 2,
+        "tripExperience": "Experienced the vibrant culture and sampled Gujarati delicacies."
+      },
+      {
+        "placeName": "Bodh Gaya Pilgrimage",
+        "communityCategory": "Spiritual Seekers",
+        "visitedLocation": "Bihar",
+        "duration": 3,
+        "tripExperience": "Meditated under the Bodhi tree and visited iconic monasteries."
+      },
+      {
+        "placeName": "Shillong Root Bridges",
+        "communityCategory": "Wanderlust Scholars",
+        "visitedLocation": "Meghalaya",
+        "duration": 4,
+        "tripExperience": "Learned about Meghalaya's fascinating root bridge ecosystem."
+      }
+
+  ]
+  
