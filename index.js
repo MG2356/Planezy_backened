@@ -224,15 +224,47 @@ app.post("/mglogin", async (req, res) => {
 
 
 // Verify OTP
+// app.post("/verify-otp", async (req, res) => {
+//   const { email, otp } = req.body;
+
+//   try {
+//     const user = await SignupModel.findOne({ email });
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+
+//     if (!user.otp || user.otpExpires < Date.now()) {
+//       return res.status(400).json({ message: "OTP expired or not found" });
+//     }
+
+//     if (user.otp !== otp) {
+//       return res.status(401).json({ message: "Invalid OTP" });
+//     }
+
+//     // Clear OTP after successful verification
+//     user.otp = undefined;
+//     user.otpExpires = undefined;
+//     await user.save();
+
+//     // Generate JWT token
+//     const token = jwt.sign({ userId: user._id }, SECRET_KEY, { expiresIn: "1h" });
+//     res.json({ message: "OTP verified successfully", token });
+//   } catch (err) {
+//     console.error("Error during OTP verification:", err);
+//     res.status(500).json({ error: "OTP verification failed" });
+//   }
+// });
 app.post("/verify-otp", async (req, res) => {
   const { email, otp } = req.body;
 
   try {
+    // Find the user by email
     const user = await SignupModel.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // Check if OTP is expired or invalid
     if (!user.otp || user.otpExpires < Date.now()) {
       return res.status(400).json({ message: "OTP expired or not found" });
     }
@@ -248,7 +280,21 @@ app.post("/verify-otp", async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign({ userId: user._id }, SECRET_KEY, { expiresIn: "1h" });
-    res.json({ message: "OTP verified successfully", token });
+
+    // Include the user's name in the response
+    const responseData = {
+      message: "OTP verified successfully",
+      token,
+      user: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+
+      },
+    };
+
+    res.json(responseData);
   } catch (err) {
     console.error("Error during OTP verification:", err);
     res.status(500).json({ error: "OTP verification failed" });
