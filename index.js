@@ -470,22 +470,11 @@ app.delete('/deleteplace/:id', (req, res) => {
 // Get Places
 app.get("/getcommunity", async (req, res) => {
   try {
-    const { name } = req.query; // Get the 'name' query parameter
-
-    let communities;
-    if (name && name !== 'All') {
-        // Filter by community name if provided and not "All"
-        communities = await Community.find({ communityCategory: name });
-    } else {
-        // Return all communities if no filter or "All" is selected
-        communities = await Community.find({});
-    }
-
-    res.status(200).json(communities);
-} catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-}
+    const community = await CommunityModel.find({}).sort("-date");
+    res.json(community);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 app.get("/getplace", async (req, res) => {
   try {
