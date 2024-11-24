@@ -408,7 +408,7 @@ app.post('/createPost', (req, res) => {
 
 const sendThankYouEmail = (userEmail, userName) => {
   const mailOptions = {
-    from: 'munishgoel45698@gmail.com', // Replace with your email address
+    from: 'planezy58@gmail.com', // Replace with your email address
     to: userEmail,
     subject: `Thank you for contacting us, ${userName}!`,
     subject: `Thank you for contacting us, ${userName}!`,
