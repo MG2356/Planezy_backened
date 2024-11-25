@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const TripModel = require('./Schema/Trip');
 const FlightModel = require('./Schema/Flight');
 const HotelModel = require('./Schema/Hotel');
@@ -7,11 +8,8 @@ const RestaurantModel = require('./Schema/Restaurant');
 const MeetingModel = require('./Schema/Meeting');
 const RailModel = require('./Schema/Rail');
 const ActivityModel = require('./Schema/Activity');
-
 const jwt = require('jsonwebtoken');
 const CommunityModel=require("./Schema/Community");
-const mongoose = require('mongoose');
-
 const router = express.Router();
 const SECRET_KEY = 'your_secret_key';
 
