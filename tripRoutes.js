@@ -12,6 +12,7 @@ const jwt = require('jsonwebtoken');
 const CommunityModel=require("./Schema/Community");
 const router = express.Router();
 const SECRET_KEY = 'your_secret_key';
+const SignupModel = require("./Schema/Signup");
 
 // Middleware for Authentication
 const authenticateToken = (req, res, next) => {
@@ -26,6 +27,25 @@ const authenticateToken = (req, res, next) => {
     next();
   });
 };
+router.delete('/deleteAccount', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.userId; // Extract user ID from the authenticated token
+
+    // Check if the user exists
+    const user = await SignupModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Delete the user
+    await SignupModel.findByIdAndDelete(userId);
+
+    res.json({ message: 'Account deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting account:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 router.post('/createPost', authenticateToken, (req, res) => {
   const communityData = {
     ...req.body,
@@ -46,18 +66,28 @@ router.post('/createPost', authenticateToken, (req, res) => {
 router.post('/addFlightToTrip', authenticateToken, async (req, res) => {
   const { tripId, flightDetails } = req.body;
 
-  if (!tripId || !flightDetails) {
-    return res.status(400).json({ error: 'Trip ID and flight details are required' });
+  if (!tripId || !Array.isArray(flightDetails) || flightDetails.length === 0) {
+    return res.status(400).json({ error: 'Trip ID and an array of flight details are required' });
   }
 
   try {
+    // Find the trip for the authenticated user
     const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
-    if (!trip) return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
 
-    const flight = new FlightModel({ ...flightDetails, tripId });
-    await flight.save();
+    // Save each flight detail and store their IDs
+    const savedFlights = await Promise.all(
+      flightDetails.map(async (flight) => {
+        const newFlight = new FlightModel({ ...flight });
+        await newFlight.save();
+        return newFlight._id; // Return the saved flight's ID
+      })
+    );
 
-    trip.flightDetails = flight._id;
+    // Update the trip's flightDetails array
+    trip.flightDetails = [...trip.flightDetails, ...savedFlights];
     await trip.save();
 
     res.json({ message: 'Flight details added to the trip successfully', trip });
