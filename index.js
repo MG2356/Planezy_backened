@@ -301,6 +301,26 @@ app.post("/verify-otp", async (req, res) => {
   }
 });
 
+app.put('/users/:id', async (req, res) => {
+  const { id } = req.params;
+  const { firstName, lastName, phoneNumber } = req.body;
+
+  try {
+    const updatedUser = await SignupModel.findByIdAndUpdate(
+      id,
+      { firstName, lastName, phoneNumber },
+      { new: true, runValidators: true } // Return the updated document and apply schema validation
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found!' });
+    }
+
+    res.status(200).json({ message: 'User updated successfully!', user: updatedUser });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating user.', error });
+  }
+});
 // Other routes...
 // Add Place
 app.post("/addplace", async (req, res) => {

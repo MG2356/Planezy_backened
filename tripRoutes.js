@@ -13,6 +13,7 @@ const CommunityModel=require("./Schema/Community");
 const router = express.Router();
 const SECRET_KEY = 'your_secret_key';
 const SignupModel = require("./Schema/Signup");
+const nodemailer = require('nodemailer');
 
 // Middleware for Authentication
 const authenticateToken = (req, res, next) => {
@@ -27,6 +28,14 @@ const authenticateToken = (req, res, next) => {
     next();
   });
 };
+const transporter = nodemailer.createTransport({
+  service: 'gmail', // If using Gmail
+  auth: {
+    user: 'planezyalerts@gmail.com', // Your email address
+    pass: 'cgjhklxeynovbbax', // Your app password or actual email password
+  },
+});
+
 router.delete('/deleteAccount', authenticateToken, async (req, res) => {
   try {
     const userId = req.userId; // Extract user ID from the authenticated token
@@ -37,10 +46,27 @@ router.delete('/deleteAccount', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
+    // Send account deletion email
+    const mailOptions = {
+      from: 'your-email@gmail.com', // Replace with your email
+      to: user.email, // Send the email to the user's email address
+      subject: 'Account Deletion Confirmation',
+      text: `Hello ${user.firstName},
+
+Your account has been successfully deleted from our system.
+
+If you have any concerns or questions, please contact our support team.
+
+Thank you,
+PlanEzy Team`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
     // Delete the user
     await SignupModel.findByIdAndDelete(userId);
 
-    res.json({ message: 'Account deleted successfully' });
+    res.json({ message: 'Account deleted successfully. A confirmation email has been sent.' });
   } catch (err) {
     console.error('Error deleting account:', err);
     res.status(500).json({ error: 'Internal server error' });
