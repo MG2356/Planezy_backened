@@ -321,6 +321,8 @@ app.put('/users/:id', async (req, res) => {
     res.status(500).json({ message: 'Error updating user.', error });
   }
 });
+
+
 // Other routes...
 // Add Place
 app.post("/addplace", async (req, res) => {

@@ -5,6 +5,8 @@ const TrendingPlaceSchema=new mongoose.Schema({
    TrendingPlaceName:String,
    TrendingPlaceType:String,
    TrendingPlaceDescription:String,
+   TrendingPlaceAddress: String,
+
 })
 const TrendingPlaceModel=mongoose.model("TrendingPlace",TrendingPlaceSchema)
 module.exports=TrendingPlaceModel

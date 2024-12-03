@@ -35,7 +35,34 @@ const transporter = nodemailer.createTransport({
     pass: 'cgjhklxeynovbbax', // Your app password or actual email password
   },
 });
+router.put('/useredit', authenticateToken, async (req, res) => {
+  const { firstName, lastName, phoneNumber } = req.body;
 
+  try {
+    // Extract user ID from authenticated token
+    const userId = req.userId; // Assume authenticateToken middleware sets req.userId
+
+    if (!userId) {
+      return res.status(401).json({ message: 'Unauthorized: Token is missing or invalid.' });
+    }
+
+    // Update the user's details
+    const updatedUser = await SignupModel.findByIdAndUpdate(
+      userId,
+      { firstName, lastName, phoneNumber },
+      { new: true, runValidators: true } // Return the updated document and apply schema validation
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found!' });
+    }
+
+    res.status(200).json({ message: 'User updated successfully!', user: updatedUser });
+  } catch (error) {
+    console.error('Error updating user:', error);
+    res.status(500).json({ message: 'Error updating user.', error });
+  }
+});
 router.delete('/deleteAccount', authenticateToken, async (req, res) => {
   try {
     const userId = req.userId; // Extract user ID from the authenticated token
