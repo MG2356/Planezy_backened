@@ -279,7 +279,8 @@ app.post("/verify-otp", async (req, res) => {
     await user.save();
 
     // Generate JWT token
-    const token = jwt.sign({ userId: user._id }, SECRET_KEY, { expiresIn: "1h" });
+// Generate JWT token with 6 days expiration
+const token = jwt.sign({ userId: user._id }, SECRET_KEY, { expiresIn: "30d" });
 
     // Include the user's name in the response
     const responseData = {
