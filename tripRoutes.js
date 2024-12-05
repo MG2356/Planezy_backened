@@ -176,7 +176,7 @@ router.post('/addCarToTrip', authenticateToken, async (req, res) => {
 //hotel
   router.post('/addHotelToTrip', authenticateToken, async (req, res) => {
     const { tripId, hotelDetails } = req.body;
-  
+
     if (!tripId || !hotelDetails) {
       return res.status(400).json({ error: 'Trip ID and hotel details are required' });
     }
@@ -191,7 +191,7 @@ router.post('/addCarToTrip', authenticateToken, async (req, res) => {
       trip.hotelDetails = hotel._id;
       await trip.save();
   
-      res.json({ message: 'Hotels details added to the trip successfully', trip });
+      res.json({ message: 'hotel Details added to the trip successfully', trip });
     } catch (err) {
       console.error("Error adding hotel details: ", err);
       res.status(500).json({ error: 'Error adding hotel details' });
@@ -250,7 +250,7 @@ router.post('/addRailToTrip', authenticateToken, async (req, res) => {
   const { tripId, railDetails } = req.body;
 
   if (!tripId || !railDetails) {
-    return res.status(400).json({ error: 'Trip ID and restaurant details are required' });
+    return res.status(400).json({ error: 'Trip ID and rail details are required' });
   }
 
   try {

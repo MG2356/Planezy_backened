@@ -20,7 +20,7 @@ const TripSchema = new mongoose.Schema({
   TripEndDate: Date,
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'Signup' },  // Reference to User
   flightDetails: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Flight' }],
-  hotelDetails: { type: mongoose.Schema.Types.ObjectId, ref: 'Hotel' },
+  hotelDetails: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Hotel' }],
   carDetails: { type: mongoose.Schema.Types.ObjectId, ref: 'Car' },
   restaurantDetails: { type: mongoose.Schema.Types.ObjectId, ref: 'Restaurant' },
   railDetails:{ type: mongoose.Schema.Types.ObjectId, ref: 'Rail' },
