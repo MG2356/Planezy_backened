@@ -68,18 +68,50 @@ app.post('/saveRecentlyViewed', async (req, res) => {
 });
 
 // Save to Favorites
+// app.post('/saveFavorite', async (req, res) => {
+//   try {
+//       const favorite = new FavoriteModel(req.body);
+//       await favorite.save();
+//       res.status(201).json({ message: 'Favorite place saved successfully!' });
+//   } catch (error) {
+//       console.error("Error saving favorite:", error);
+//       res.status(500).json({ message: 'Error saving favorite place', error });
+//   }
+// });
+
 app.post('/saveFavorite', async (req, res) => {
   try {
-      const favorite = new FavoriteModel(req.body);
-      await favorite.save();
-      res.status(201).json({ message: 'Favorite place saved successfully!' });
+    const token = req.headers.authorization?.split(' ')[1]; // Extract token from Authorization header
+    if (!token) {
+      return res.status(401).json({ message: 'Authentication token is missing' });
+    }
+
+    // Verify and decode the token
+    const decoded = jwt.verify(token, SECRET_KEY);
+    const userId = decoded.userId;
+
+    if (!userId) {
+      return res.status(401).json({ message: 'Invalid token' });
+    }
+
+    // Add user ID to the favorite place data
+    const favoriteData = { ...req.body, userId };
+    const favorite = new FavoriteModel(favoriteData);
+
+    // Save the favorite place
+    await favorite.save();
+
+    res.status(201).json({ message: 'Favorite place saved successfully!' });
   } catch (error) {
-      console.error("Error saving favorite:", error);
-      res.status(500).json({ message: 'Error saving favorite place', error });
+    console.error("Error saving favorite:", error);
+
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({ message: 'Invalid authentication token' });
+    }
+
+    res.status(500).json({ message: 'Error saving favorite place', error });
   }
 });
-
-
 
 
 
