@@ -373,7 +373,7 @@ router.post('/addActivityToTrip', authenticateToken, async (req, res) => {
     // Save each flight detail and store their IDs
     const savedActivity = await Promise.all(
       activityDetails.map(async (activity) => {
-        const newActivity = new ActivityModel({ ...rail });
+        const newActivity = new ActivityModel({ ...activity });
         await newActivity.save();
         return newActivity._id; // Return the saved flight's ID
       })
