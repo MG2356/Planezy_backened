@@ -183,6 +183,39 @@ try {
   res.status(500).json({ error: 'Error adding hotel details' });
 }
 });
+router.delete('/removeHotelFromTrip', authenticateToken, async (req, res) => {
+  const { tripId, hotelIds } = req.body;
+
+  // Validate request body
+  if (!tripId || !Array.isArray(hotelIds) || hotelIds.length === 0) {
+    return res.status(400).json({ error: 'Trip ID and an array of hotel IDs are required' });
+  }
+
+  try {
+    // Find the trip for the authenticated user
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Filter out the hotels to be removed
+    trip.hotelDetails = trip.hotelDetails.filter(
+      (hotelId) => !hotelIds.includes(hotelId.toString())
+    );
+
+    // Save the updated trip
+    await trip.save();
+
+    // Optionally, delete the removed hotel documents from the database
+    await HotelModel.deleteMany({ _id: { $in: hotelIds } });
+
+    res.json({ message: 'Hotel details removed from the trip successfully', trip });
+  } catch (err) {
+    console.error('Error removing hotel details: ', err);
+    res.status(500).json({ error: 'Error removing hotel details' });
+  }
+});
+
 //Car 
 router.post('/addCarToTrip', authenticateToken, async (req, res) => {
   const { tripId, carDetails } = req.body;
