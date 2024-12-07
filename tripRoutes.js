@@ -149,36 +149,46 @@ router.post('/addFlightToTrip', authenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Error adding flight details' });
   }
 });
-//Car 
-router.post('/addCarToTrip', authenticateToken, async (req, res) => {
-    const { tripId, carDetails } = req.body;
-  
-    if (!tripId || !carDetails) {
-      return res.status(400).json({ error: 'Trip ID and flight details are required' });
-    }
-  
-    try {
-      const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
-      if (!trip) return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
-  
-      const car = new CarModel({ ...carDetails, tripId });
-      await car.save();
-  
-      trip.carDetails = car._id;
-      await trip.save();
-  
-      res.json({ message: 'Flight details added to the trip successfully', trip });
-    } catch (err) {
-      console.error("Error adding flight details: ", err);
-      res.status(500).json({ error: 'Error adding flight details' });
-    }
-  });
 //hotel
 router.post('/addHotelToTrip', authenticateToken, async (req, res) => {
-    const { tripId, hotelDetails } = req.body;
+  const { tripId, hotelDetails } = req.body;
 
-  if (!tripId || !Array.isArray(hotelDetails) || hotelDetails.length === 0) {
-    return res.status(400).json({ error: 'Trip ID and an array of hotel details are required' });
+if (!tripId || !Array.isArray(hotelDetails) || hotelDetails.length === 0) {
+  return res.status(400).json({ error: 'Trip ID and an array of hotel details are required' });
+}
+
+try {
+  // Find the trip for the authenticated user
+  const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+  if (!trip) {
+    return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+  }
+
+  // Save each flight detail and store their IDs
+  const savedHotel = await Promise.all(
+    hotelDetails.map(async (hotel) => {
+      const newHotel = new HotelModel({ ...hotel });
+      await newHotel.save();
+      return newHotel._id; // Return the saved flight's ID
+    })
+  );
+
+  // Update the trip's hotelDetails array
+  trip.hotelDetails = [...trip.hotelDetails, ...savedHotel];
+  await trip.save();
+
+  res.json({ message: 'hotel details added to the trip successfully', trip });
+} catch (err) {
+  console.error("Error adding hotel details: ", err);
+  res.status(500).json({ error: 'Error adding hotel details' });
+}
+});
+//Car 
+router.post('/addCarToTrip', authenticateToken, async (req, res) => {
+  const { tripId, carDetails } = req.body;
+
+  if (!tripId || !Array.isArray(carDetails) || carDetails.length === 0) {
+    return res.status(400).json({ error: 'Trip ID and an array of car details are required' });
   }
 
   try {
@@ -189,118 +199,161 @@ router.post('/addHotelToTrip', authenticateToken, async (req, res) => {
     }
 
     // Save each flight detail and store their IDs
-    const savedHotel = await Promise.all(
-      hotelDetails.map(async (hotel) => {
-        const newHotel = new HotelModel({ ...hotel });
-        await newHotel.save();
-        return newHotel._id; // Return the saved flight's ID
+    const savedCar = await Promise.all(
+      carDetails.map(async (car) => {
+        const newCar = new CarModel({ ...car });
+        await newCar.save();
+        return newCar._id; // Return the saved flight's ID
       })
     );
 
-    // Update the trip's hotelDetails array
-    trip.hotelDetails = [...trip.hotelDetails, ...savedHotel];
+    // Update the trip's carDetails array
+    trip.carDetails = [...trip.carDetails, ...savedCar];
     await trip.save();
 
-    res.json({ message: 'hotel details added to the trip successfully', trip });
+    res.json({ message: 'car details added to the trip successfully', trip });
   } catch (err) {
-    console.error("Error adding hotel details: ", err);
-    res.status(500).json({ error: 'Error adding hotel details' });
+    console.error("Error adding car details: ", err);
+    res.status(500).json({ error: 'Error adding car details' });
   }
   });
-  //restaurant 
-  router.post('/addRestaurantToTrip', authenticateToken, async (req, res) => {
+
+//restaurant 
+router.post('/addRestaurantToTrip', authenticateToken, async (req, res) => {
     const { tripId, restaurantDetails } = req.body;
   
-    if (!tripId || !restaurantDetails) {
-      return res.status(400).json({ error: 'Trip ID and restaurant details are required' });
+
+    if (!tripId || !Array.isArray(restaurantDetails) || restaurantDetails.length === 0) {
+      return res.status(400).json({ error: 'Trip ID and an array of Restaurant details are required' });
     }
   
     try {
+      // Find the trip for the authenticated user
       const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
-      if (!trip) return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+      if (!trip) {
+        return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+      }
   
-      const restaurant = new RestaurantModel({ ...restaurantDetails, tripId });
-      await restaurant.save();
+      // Save each flight detail and store their IDs
+      const savedRestaurant = await Promise.all(
+        restaurantDetails.map(async (restaurant) => {
+          const newRestaurant = new RestaurantModel({ ...restaurant });
+          await newRestaurant.save();
+          return newRestaurant._id; // Return the saved flight's ID
+        })
+      );
   
-      trip.restaurantDetails = restaurant._id;
+      // Update the trip's restaurantDetails array
+      trip.restaurantDetails = [...trip.restaurantDetails, ...savedRestaurant];
       await trip.save();
   
-      res.json({ message: 'restaurant details added to the trip successfully', trip });
+      res.json({ message: 'Restaurant details added to the trip successfully', trip });
     } catch (err) {
-      console.error("Error adding hotel details: ", err);
-      res.status(500).json({ error: 'Error adding hotel details' });
+      console.error("Error adding Restaurant details: ", err);
+      res.status(500).json({ error: 'Error adding Restaurant details' });
     }
   });
 //Meeting 
 router.post('/addMeetingToTrip', authenticateToken, async (req, res) => {
   const { tripId, meetingDetails } = req.body;
 
-  if (!tripId || !meetingDetails) {
-    return res.status(400).json({ error: 'Trip ID and restaurant details are required' });
+  if (!tripId || !Array.isArray(meetingDetails) || meetingDetails.length === 0) {
+    return res.status(400).json({ error: 'Trip ID and an array of Meeting details are required' });
   }
 
   try {
+    // Find the trip for the authenticated user
     const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
-    if (!trip) return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
 
-    const meeting = new MeetingModel({ ...meetingDetails, tripId });
-    await meeting.save();
+    // Save each flight detail and store their IDs
+    const savedMeeting = await Promise.all(
+      meetingDetails.map(async (meeting) => {
+        const newMeeting = new MeetingModel({ ...meeting });
+        await newMeeting.save();
+        return newMeeting._id; // Return the saved flight's ID
+      })
+    );
 
-    trip.meetingDetails = meeting._id;
+    // Update the trip's meetingDetails array
+    trip.meetingDetails = [...trip.meetingDetails, ...savedMeeting];
     await trip.save();
 
-    res.json({ message: 'meeting Details added to the trip successfully', trip });
+    res.json({ message: 'Meeting details added to the trip successfully', trip });
   } catch (err) {
-    console.error("Error adding meeting details: ", err);
-    res.status(500).json({ error: 'Error adding meeting details' });
+    console.error("Error adding Meeting details: ", err);
+    res.status(500).json({ error: 'Error adding Meeting details' });
   }
 });
 //Rail
 router.post('/addRailToTrip', authenticateToken, async (req, res) => {
+
   const { tripId, railDetails } = req.body;
 
-  if (!tripId || !railDetails) {
-    return res.status(400).json({ error: 'Trip ID and rail details are required' });
+  if (!tripId || !Array.isArray(railDetails) || railDetails.length === 0) {
+    return res.status(400).json({ error: 'Trip ID and an array of Meeting details are required' });
   }
 
   try {
+    // Find the trip for the authenticated user
     const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
-    if (!trip) return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
 
-    const rail = new RailModel({ ...railDetails, tripId });
-    await rail.save();
+    // Save each flight detail and store their IDs
+    const savedRail = await Promise.all(
+      railDetails.map(async (rail) => {
+        const newRail = new RailModel({ ...rail });
+        await newRail.save();
+        return newRail._id; // Return the saved flight's ID
+      })
+    );
 
-    trip.railDetails = rail._id;
+    // Update the trip's railDetails array
+    trip.railDetails = [...trip.railDetails, ...savedRail];
     await trip.save();
 
-    res.json({ message: 'rail Details added to the trip successfully', trip });
+    res.json({ message: 'Rail details added to the trip successfully', trip });
   } catch (err) {
-    console.error("Error adding rail details: ", err);
-    res.status(500).json({ error: 'Error adding rail details' });
+    console.error("Error adding Rail details: ", err);
+    res.status(500).json({ error: 'Error adding Rail details' });
   }
 });
 //Acitivity
 router.post('/addActivityToTrip', authenticateToken, async (req, res) => {
   const { tripId, activityDetails } = req.body;
 
-  if (!tripId || !activityDetails) {
-    return res.status(400).json({ error: 'Trip ID and restaurant details are required' });
+  if (!tripId || !Array.isArray(activityDetails) || activityDetails.length === 0) {
+    return res.status(400).json({ error: 'Trip ID and an array of Meeting details are required' });
   }
 
   try {
+    // Find the trip for the authenticated user
     const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
-    if (!trip) return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
 
-    const activity = new ActivityModel({ ...activityDetails, tripId });
-    await activity.save();
+    // Save each flight detail and store their IDs
+    const savedActivity = await Promise.all(
+      activityDetails.map(async (activity) => {
+        const newActivity = new ActivityModel({ ...rail });
+        await newActivity.save();
+        return newActivity._id; // Return the saved flight's ID
+      })
+    );
 
-    trip.activityDetails = activity._id;
+    // Update the trip's activityDetails array
+    trip.activityDetails = [...trip.activityDetails, ...savedActivity];
     await trip.save();
 
-    res.json({ message: 'activity Details added to the trip successfully', trip });
+    res.json({ message: 'Activity details added to the trip successfully', trip });
   } catch (err) {
-    console.error("Error adding activity details: ", err);
-    res.status(500).json({ error: 'Error adding activity details' });
+    console.error("Error adding Activity details: ", err);
+    res.status(500).json({ error: 'Error adding Activity details' });
   }
 });
 
@@ -454,33 +507,7 @@ router.delete('/deleteTrip/:tripId', authenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Error deleting trip' });
   }
 });
-router.delete('/deleteFlightFromTrip', authenticateToken, async (req, res) => {
-  const { tripId, flightId } = req.body;
 
-  if (!tripId || !flightId) {
-    return res.status(400).json({ error: 'Trip ID and Flight ID are required' });
-  }
-
-  try {
-    // Find the trip for the authenticated user
-    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
-    if (!trip) {
-      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
-    }
-
-    // Remove the flight from the trip's flightDetails array
-    trip.flightDetails = trip.flightDetails.filter(id => id.toString() !== flightId);
-    await trip.save();
-
-    // Optionally, delete the flight document from the Flight collection
-    await FlightModel.findByIdAndDelete(flightId);
-
-    res.json({ message: 'Flight removed from the trip successfully', trip });
-  } catch (err) {
-    console.error("Error deleting flight: ", err);
-    res.status(500).json({ error: 'Error deleting flight' });
-  }
-});
 router.put('/editFlightInTrip', authenticateToken, async (req, res) => {
   const { tripId, flightId, updatedFlightDetails } = req.body;
 
@@ -513,11 +540,11 @@ router.put('/editFlightInTrip', authenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Error editing flight details' });
   }
 });
-router.delete('/deleteHotelFromTrip', authenticateToken, async (req, res) => {
-  const { tripId, hotelId } = req.body;
+router.put('/editCarInTrip', authenticateToken, async (req, res) => {
+  const { tripId, carId, updatedCarDetails } = req.body;
 
-  if (!tripId || !hotelId) {
-    return res.status(400).json({ error: 'Trip ID and Hotel ID are required' });
+  if (!tripId || !carId || !updatedCarDetails) {
+    return res.status(400).json({ error: 'Trip ID, Car ID, and updated car details are required' });
   }
 
   try {
@@ -527,17 +554,22 @@ router.delete('/deleteHotelFromTrip', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
     }
 
-    // Remove the hotel from the trip's hotelDetails array
-    trip.hotelDetails = trip.hotelDetails.filter(id => id.toString() !== hotelId);
-    await trip.save();
+    // Check if the car ID exists in the trip's carDetails array
+    const carExists = trip.carDetails.some(id => id.toString() === carId);
+    if (!carExists) {
+      return res.status(404).json({ error: 'Car not found in this trip' });
+    }
 
-    // Optionally, delete the hotel document from the Hotel collection
-    await HotelModel.findByIdAndDelete(hotelId);
+    // Update the car details in the CarModel
+    const updatedCar = await CarModel.findByIdAndUpdate(carId, updatedCarDetails, { new: true });
+    if (!updatedCar) {
+      return res.status(404).json({ error: 'Car not found in database' });
+    }
 
-    res.json({ message: 'Hotel removed from the trip successfully', trip });
+    res.json({ message: 'Car details updated successfully', updatedCar });
   } catch (err) {
-    console.error("Error deleting hotel: ", err);
-    res.status(500).json({ error: 'Error deleting hotel' });
+    console.error("Error editing car details: ", err);
+    res.status(500).json({ error: 'Error editing car details' });
   }
 });
 router.put('/editHotelInTrip', authenticateToken, async (req, res) => {
@@ -570,6 +602,347 @@ router.put('/editHotelInTrip', authenticateToken, async (req, res) => {
   } catch (err) {
     console.error("Error editing hotel details: ", err);
     res.status(500).json({ error: 'Error editing hotel details' });
+  }
+});
+router.put('/editRestaurantInTrip', authenticateToken, async (req, res) => {
+  const { tripId, restaurantId, updatedRestaurantDetails } = req.body;
+
+  if (!tripId || !restaurantId || !updatedRestaurantDetails) {
+    return res.status(400).json({ error: 'Trip ID, Restaurant ID, and updated restaurant details are required' });
+  }
+
+  try {
+    // Find the trip for the authenticated user
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Check if the restaurant ID exists in the trip's restaurantDetails array
+    const restaurantExists = trip.restaurantDetails.some(id => id.toString() === restaurantId);
+    if (!restaurantExists) {
+      return res.status(404).json({ error: 'Restaurant not found in this trip' });
+    }
+
+    // Update the restaurant details in the Restaurant collection
+    const updatedRestaurant = await RestaurantModel.findByIdAndUpdate(
+      restaurantId,
+      updatedRestaurantDetails,
+      { new: true }
+    );
+
+    if (!updatedRestaurant) {
+      return res.status(404).json({ error: 'Restaurant not found in database' });
+    }
+
+    res.json({ message: 'Restaurant details updated successfully', updatedRestaurant });
+  } catch (err) {
+    console.error("Error editing restaurant details: ", err);
+    res.status(500).json({ error: 'Error editing restaurant details' });
+  }
+});
+router.put('/editMeetingInTrip', authenticateToken, async (req, res) => {
+  const { tripId, meetingId, updatedMeetingDetails } = req.body;
+
+  if (!tripId || !meetingId || !updatedMeetingDetails) {
+    return res.status(400).json({ error: 'Trip ID, Meeting ID, and updated meeting details are required' });
+  }
+
+  try {
+    // Find the trip for the authenticated user
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Check if the meeting ID exists in the trip's meetingDetails array
+    const meetingExists = trip.meetingDetails.some(id => id.toString() === meetingId);
+    if (!meetingExists) {
+      return res.status(404).json({ error: 'Meeting not found in this trip' });
+    }
+
+    // Update the meeting details in the MeetingModel
+    const updatedMeeting = await MeetingModel.findByIdAndUpdate(
+      meetingId,
+      updatedMeetingDetails,
+      { new: true }
+    );
+
+    if (!updatedMeeting) {
+      return res.status(404).json({ error: 'Meeting not found in database' });
+    }
+
+    res.json({ message: 'Meeting details updated successfully', updatedMeeting });
+  } catch (err) {
+    console.error("Error editing meeting details: ", err);
+    res.status(500).json({ error: 'Error editing meeting details' });
+  }
+});
+router.put('/editRailInTrip', authenticateToken, async (req, res) => {
+  const { tripId, railId, updatedRailDetails } = req.body;
+
+  if (!tripId || !railId || !updatedRailDetails) {
+    return res.status(400).json({ error: 'Trip ID, Rail ID, and updated rail details are required' });
+  }
+
+  try {
+    // Find the trip for the authenticated user
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Check if the rail ID exists in the trip's railDetails array
+    const railExists = trip.railDetails.some(id => id.toString() === railId);
+    if (!railExists) {
+      return res.status(404).json({ error: 'Rail not found in this trip' });
+    }
+
+    // Update the rail details in the RailModel
+    const updatedRail = await RailModel.findByIdAndUpdate(
+      railId,
+      updatedRailDetails,
+      { new: true }
+    );
+
+    if (!updatedRail) {
+      return res.status(404).json({ error: 'Rail not found in database' });
+    }
+
+    res.json({ message: 'Rail details updated successfully', updatedRail });
+  } catch (err) {
+    console.error("Error editing rail details: ", err);
+    res.status(500).json({ error: 'Error editing rail details' });
+  }
+});
+router.put('/editActivityInTrip', authenticateToken, async (req, res) => {
+  const { tripId, activityId, updatedActivityDetails } = req.body;
+
+  if (!tripId || !activityId || !updatedActivityDetails) {
+    return res.status(400).json({ error: 'Trip ID, Activity ID, and updated activity details are required' });
+  }
+
+  try {
+    // Find the trip for the authenticated user
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Check if the activity ID exists in the trip's activityDetails array
+    const activityExists = trip.activityDetails.some(id => id.toString() === activityId);
+    if (!activityExists) {
+      return res.status(404).json({ error: 'Activity not found in this trip' });
+    }
+
+    // Update the activity details in the ActivityModel
+    const updatedActivity = await ActivityModel.findByIdAndUpdate(
+      activityId,
+      updatedActivityDetails,
+      { new: true }
+    );
+
+    if (!updatedActivity) {
+      return res.status(404).json({ error: 'Activity not found in database' });
+    }
+
+    res.json({ message: 'Activity details updated successfully', updatedActivity });
+  } catch (err) {
+    console.error("Error editing activity details: ", err);
+    res.status(500).json({ error: 'Error editing activity details' });
+  }
+});
+
+
+router.delete('/deleteFlightFromTrip', authenticateToken, async (req, res) => {
+  const { tripId, flightId } = req.body;
+
+  if (!tripId || !flightId) {
+    return res.status(400).json({ error: 'Trip ID and Flight ID are required' });
+  }
+
+  try {
+    // Find the trip for the authenticated user
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Remove the flight from the trip's flightDetails array
+    trip.flightDetails = trip.flightDetails.filter(id => id.toString() !== flightId);
+    await trip.save();
+
+    // Optionally, delete the flight document from the Flight collection
+    await FlightModel.findByIdAndDelete(flightId);
+
+    res.json({ message: 'Flight removed from the trip successfully', trip });
+  } catch (err) {
+    console.error("Error deleting flight: ", err);
+    res.status(500).json({ error: 'Error deleting flight' });
+  }
+});
+router.delete('/deleteHotelFromTrip', authenticateToken, async (req, res) => {
+  const { tripId, hotelId } = req.body;
+
+  if (!tripId || !hotelId) {
+    return res.status(400).json({ error: 'Trip ID and Hotel ID are required' });
+  }
+
+  try {
+    // Find the trip for the authenticated user
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Remove the hotel from the trip's hotelDetails array
+    trip.hotelDetails = trip.hotelDetails.filter(id => id.toString() !== hotelId);
+    await trip.save();
+
+    // Optionally, delete the hotel document from the Hotel collection
+    await HotelModel.findByIdAndDelete(hotelId);
+
+    res.json({ message: 'Hotel removed from the trip successfully', trip });
+  } catch (err) {
+    console.error("Error deleting hotel: ", err);
+    res.status(500).json({ error: 'Error deleting hotel' });
+  }
+});
+router.delete('/deleteCarFromTrip', authenticateToken, async (req, res) => {
+  const { tripId, carId } = req.body;
+
+  if (!tripId || !carId) {
+    return res.status(400).json({ error: 'Trip ID and Car ID are required' });
+  }
+
+  try {
+    // Find the trip for the authenticated user
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Remove the car from the trip's carDetails array
+    trip.carDetails = trip.carDetails.filter(id => id.toString() !== carId);
+    await trip.save();
+
+    // Optionally, delete the car document from the CarModel collection
+    await CarModel.findByIdAndDelete(carId);
+
+    res.json({ message: 'Car removed from the trip successfully', trip });
+  } catch (err) {
+    console.error("Error deleting car: ", err);
+    res.status(500).json({ error: 'Error deleting car' });
+  }
+});
+router.delete('/deleteRestaurantFromTrip', authenticateToken, async (req, res) => {
+  const { tripId, restaurantId } = req.body;
+
+  if (!tripId || !restaurantId) {
+    return res.status(400).json({ error: 'Trip ID and Restaurant ID are required' });
+  }
+
+  try {
+    // Find the trip for the authenticated user
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Remove the restaurant from the trip's restaurantDetails array
+    trip.restaurantDetails = trip.restaurantDetails.filter(id => id.toString() !== restaurantId);
+    await trip.save();
+
+    // Optionally, delete the restaurant document from the Restaurant collection
+    await RestaurantModel.findByIdAndDelete(restaurantId);
+
+    res.json({ message: 'Restaurant removed from the trip successfully', trip });
+  } catch (err) {
+    console.error("Error deleting restaurant: ", err);
+    res.status(500).json({ error: 'Error deleting restaurant' });
+  }
+});
+
+router.delete('/deleteMeetingFromTrip', authenticateToken, async (req, res) => {
+  const { tripId, meetingId } = req.body;
+
+  if (!tripId || !meetingId) {
+    return res.status(400).json({ error: 'Trip ID and Meeting ID are required' });
+  }
+
+  try {
+    // Find the trip for the authenticated user
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Remove the meeting from the trip's meetingDetails array
+    trip.meetingDetails = trip.meetingDetails.filter(id => id.toString() !== meetingId);
+    await trip.save();
+
+    // Optionally, delete the meeting document from the MeetingModel collection
+    await MeetingModel.findByIdAndDelete(meetingId);
+
+    res.json({ message: 'Meeting removed from the trip successfully', trip });
+  } catch (err) {
+    console.error("Error deleting meeting: ", err);
+    res.status(500).json({ error: 'Error deleting meeting' });
+  }
+});
+
+router.delete('/deleteRailFromTrip', authenticateToken, async (req, res) => {
+  const { tripId, railId } = req.body;
+
+  if (!tripId || !railId) {
+    return res.status(400).json({ error: 'Trip ID and Rail ID are required' });
+  }
+
+  try {
+    // Find the trip for the authenticated user
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Remove the rail from the trip's railDetails array
+    trip.railDetails = trip.railDetails.filter(id => id.toString() !== railId);
+    await trip.save();
+
+    // Optionally, delete the rail document from the RailModel collection
+    await RailModel.findByIdAndDelete(railId);
+
+    res.json({ message: 'Rail removed from the trip successfully', trip });
+  } catch (err) {
+    console.error("Error deleting rail: ", err);
+    res.status(500).json({ error: 'Error deleting rail' });
+  }
+});
+router.delete('/deleteActivityFromTrip', authenticateToken, async (req, res) => {
+  const { tripId, activityId } = req.body;
+
+  if (!tripId || !activityId) {
+    return res.status(400).json({ error: 'Trip ID and Activity ID are required' });
+  }
+
+  try {
+    // Find the trip for the authenticated user
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Remove the activity from the trip's activityDetails array
+    trip.activityDetails = trip.activityDetails.filter(id => id.toString() !== activityId);
+    await trip.save();
+
+    // Optionally, delete the activity document from the ActivityModel collection
+    await ActivityModel.findByIdAndDelete(activityId);
+
+    res.json({ message: 'Activity removed from the trip successfully', trip });
+  } catch (err) {
+    console.error("Error deleting activity: ", err);
+    res.status(500).json({ error: 'Error deleting activity' });
   }
 });
 
