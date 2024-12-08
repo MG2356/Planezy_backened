@@ -978,6 +978,458 @@ router.delete('/deleteActivityFromTrip', authenticateToken, async (req, res) => 
     res.status(500).json({ error: 'Error deleting activity' });
   }
 });
+////////////////////////////////////////////////////////////////////////////////
+
+router.delete('/deleteFlightFromTrip/:tripId/:flightId', authenticateToken, async (req, res) => {
+  const { tripId, flightId } = req.params;
+
+  try {
+    // Find the trip for the authenticated user
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Check if the flight ID exists in the trip's flightDetails array
+    const flightIndex = trip.flightDetails.indexOf(flightId);
+    if (flightIndex === -1) {
+      return res.status(404).json({ error: 'Flight not found in this trip' });
+    }
+
+    // Remove the flight ID from the flightDetails array
+    trip.flightDetails.splice(flightIndex, 1);
+
+    // Save the updated trip
+    await trip.save();
+
+    // Optionally, delete the flight record from the FlightModel
+    await FlightModel.deleteOne({ _id: flightId });
+
+    res.json({ message: 'Flight removed from trip successfully', trip });
+  } catch (err) {
+    console.error("Error deleting flight: ", err);
+    res.status(500).json({ error: 'Error deleting flight' });
+  }
+});
+router.delete('/deleteHotelFromTrip/:tripId/:hotelId', authenticateToken, async (req, res) => {
+  const { tripId, hotelId } = req.params;
+
+  try {
+    // Find the trip for the authenticated user
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Check if the hotel ID exists in the trip's hotelDetails array
+    const hotelIndex = trip.hotelDetails.indexOf(hotelId);
+    if (hotelIndex === -1) {
+      return res.status(404).json({ error: 'Hotel not found in this trip' });
+    }
+
+    // Remove the hotel ID from the hotelDetails array
+    trip.hotelDetails.splice(hotelIndex, 1);
+
+    // Save the updated trip
+    await trip.save();
+
+    // Optionally, delete the hotel record from the HotelModel
+    await HotelModel.deleteOne({ _id: hotelId });
+
+    res.json({ message: 'Hotel removed from trip successfully', trip });
+  } catch (err) {
+    console.error("Error deleting hotel: ", err);
+    res.status(500).json({ error: 'Error deleting hotel' });
+  }
+});
+router.delete('/deleteCarFromTrip/:tripId/:carId', authenticateToken, async (req, res) => {
+  const { tripId, carId } = req.params;
+
+  try {
+    // Find the trip for the authenticated user
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Check if the car ID exists in the trip's carDetails array
+    const carIndex = trip.carDetails.indexOf(carId);
+    if (carIndex === -1) {
+      return res.status(404).json({ error: 'Car not found in this trip' });
+    }
+
+    // Remove the car ID from the carDetails array
+    trip.carDetails.splice(carIndex, 1);
+
+    // Save the updated trip
+    await trip.save();
+
+    // Optionally, delete the car record from the CarModel
+    await CarModel.deleteOne({ _id: carId });
+
+    res.json({ message: 'Car removed from trip successfully', trip });
+  } catch (err) {
+    console.error("Error deleting car: ", err);
+    res.status(500).json({ error: 'Error deleting car' });
+  }
+});
+router.delete('/deleteRestaurantFromTrip/:tripId/:restaurantId', authenticateToken, async (req, res) => {
+  const { tripId, restaurantId } = req.params;
+
+  try {
+    // Find the trip for the authenticated user
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Check if the restaurant ID exists in the trip's restaurantDetails array
+    const restaurantIndex = trip.restaurantDetails.indexOf(restaurantId);
+    if (restaurantIndex === -1) {
+      return res.status(404).json({ error: 'Restaurant not found in this trip' });
+    }
+
+    // Remove the restaurant ID from the restaurantDetails array
+    trip.restaurantDetails.splice(restaurantIndex, 1);
+
+    // Save the updated trip
+    await trip.save();
+
+    // Optionally, delete the restaurant record from the RestaurantModel
+    await RestaurantModel.deleteOne({ _id: restaurantId });
+
+    res.json({ message: 'Restaurant removed from trip successfully', trip });
+  } catch (err) {
+    console.error("Error deleting restaurant: ", err);
+    res.status(500).json({ error: 'Error deleting restaurant' });
+  }
+});
+router.delete('/deleteMeetingFromTrip/:tripId/:meetingId', authenticateToken, async (req, res) => {
+  const { tripId, meetingId } = req.params;
+
+  try {
+    // Find the trip for the authenticated user
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Check if the meeting ID exists in the trip's meetingDetails array
+    const meetingIndex = trip.meetingDetails.indexOf(meetingId);
+    if (meetingIndex === -1) {
+      return res.status(404).json({ error: 'Meeting not found in this trip' });
+    }
+
+    // Remove the meeting ID from the meetingDetails array
+    trip.meetingDetails.splice(meetingIndex, 1);
+
+    // Save the updated trip
+    await trip.save();
+
+    // Optionally, delete the meeting document from the MeetingModel
+    await MeetingModel.deleteOne({ _id: meetingId });
+
+    res.json({ message: 'Meeting removed from trip successfully', trip });
+  } catch (err) {
+    console.error("Error deleting meeting: ", err);
+    res.status(500).json({ error: 'Error deleting meeting' });
+  }
+});
+router.delete('/deleteRailFromTrip/:tripId/:railId', authenticateToken, async (req, res) => {
+  const { tripId, railId } = req.params;
+
+  try {
+    // Find the trip for the authenticated user
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Check if the rail ID exists in the trip's railDetails array
+    const railIndex = trip.railDetails.indexOf(railId);
+    if (railIndex === -1) {
+      return res.status(404).json({ error: 'Rail detail not found in this trip' });
+    }
+
+    // Remove the rail ID from the railDetails array
+    trip.railDetails.splice(railIndex, 1);
+
+    // Save the updated trip
+    await trip.save();
+
+    // Optionally, delete the rail record from the RailModel
+    await RailModel.deleteOne({ _id: railId });
+
+    res.json({ message: 'Rail detail removed from trip successfully', trip });
+  } catch (err) {
+    console.error("Error deleting rail detail: ", err);
+    res.status(500).json({ error: 'Error deleting rail detail' });
+  }
+});
+router.delete('/deleteActivityFromTrip/:tripId/:activityId', authenticateToken, async (req, res) => {
+  const { tripId, activityId } = req.params;
+
+  try {
+    // Find the trip for the authenticated user
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Check if the activity ID exists in the trip's activityDetails array
+    const activityIndex = trip.activityDetails.indexOf(activityId);
+    if (activityIndex === -1) {
+      return res.status(404).json({ error: 'Activity not found in this trip' });
+    }
+
+    // Remove the activity ID from the activityDetails array
+    trip.activityDetails.splice(activityIndex, 1);
+
+    // Save the updated trip
+    await trip.save();
+
+    // Optionally, delete the activity record from the ActivityModel
+    await ActivityModel.deleteOne({ _id: activityId });
+
+    res.json({ message: 'Activity removed from trip successfully', trip });
+  } catch (err) {
+    console.error("Error deleting activity: ", err);
+    res.status(500).json({ error: 'Error deleting activity' });
+  }
+});
+
+
+router.put('/editFlightInTrip/:tripId/:flightId', authenticateToken, async (req, res) => {
+  const { tripId, flightId } = req.params;
+  const updatedFlightDetails = req.body;
+
+  if (!updatedFlightDetails || Object.keys(updatedFlightDetails).length === 0) {
+    return res.status(400).json({ error: 'Updated flight details are required' });
+  }
+
+  try {
+    // Find the trip for the authenticated user
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Check if the flight ID exists in the trip's flightDetails array
+    if (!trip.flightDetails.includes(flightId)) {
+      return res.status(404).json({ error: 'Flight not found in this trip' });
+    }
+
+    // Find and update the flight in the FlightModel collection
+    const flight = await FlightModel.findByIdAndUpdate(flightId, updatedFlightDetails, { new: true });
+    if (!flight) {
+      return res.status(404).json({ error: 'Flight not found in the database' });
+    }
+
+    res.json({ message: 'Flight details updated successfully', flight });
+  } catch (err) {
+    console.error("Error editing flight: ", err);
+    res.status(500).json({ error: 'Error editing flight' });
+  }
+});
+router.put('/editHotelInTrip/:tripId/:hotelId', authenticateToken, async (req, res) => {
+  const { tripId, hotelId } = req.params;
+  const updatedHotelDetails = req.body;
+
+  if (!updatedHotelDetails || Object.keys(updatedHotelDetails).length === 0) {
+    return res.status(400).json({ error: 'Updated hotel details are required' });
+  }
+
+  try {
+    // Find the trip for the authenticated user
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Check if the hotel ID exists in the trip's hotelDetails array
+    if (!trip.hotelDetails.includes(hotelId)) {
+      return res.status(404).json({ error: 'Hotel not found in this trip' });
+    }
+
+    // Find and update the hotel in the HotelModel collection
+    const hotel = await HotelModel.findByIdAndUpdate(hotelId, updatedHotelDetails, { new: true });
+    if (!hotel) {
+      return res.status(404).json({ error: 'Hotel not found in the database' });
+    }
+
+    res.json({ message: 'Hotel details updated successfully', hotel });
+  } catch (err) {
+    console.error("Error editing hotel: ", err);
+    res.status(500).json({ error: 'Error editing hotel' });
+  }
+});
+router.put('/editCarInTrip/:tripId/:carId', authenticateToken, async (req, res) => {
+  const { tripId, carId } = req.params;
+  const updatedCarDetails = req.body;
+
+  if (!updatedCarDetails || Object.keys(updatedCarDetails).length === 0) {
+    return res.status(400).json({ error: 'Updated car details are required' });
+  }
+
+  try {
+    // Find the trip for the authenticated user
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Check if the car ID exists in the trip's carDetails array
+    if (!trip.carDetails.includes(carId)) {
+      return res.status(404).json({ error: 'Car not found in this trip' });
+    }
+
+    // Find and update the car in the CarModel collection
+    const car = await CarModel.findByIdAndUpdate(carId, updatedCarDetails, { new: true });
+    if (!car) {
+      return res.status(404).json({ error: 'Car not found in the database' });
+    }
+
+    res.json({ message: 'Car details updated successfully', car });
+  } catch (err) {
+    console.error("Error editing car: ", err);
+    res.status(500).json({ error: 'Error editing car' });
+  }
+});
+router.put('/editRestaurantInTrip/:tripId/:restaurantId', authenticateToken, async (req, res) => {
+  const { tripId, restaurantId } = req.params;
+  const updatedRestaurantDetails = req.body;
+
+  if (!updatedRestaurantDetails || Object.keys(updatedRestaurantDetails).length === 0) {
+    return res.status(400).json({ error: 'Updated restaurant details are required' });
+  }
+
+  try {
+    // Find the trip for the authenticated user
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Check if the restaurant ID exists in the trip's restaurantDetails array
+    if (!trip.restaurantDetails.includes(restaurantId)) {
+      return res.status(404).json({ error: 'Restaurant not found in this trip' });
+    }
+
+    // Find and update the restaurant in the RestaurantModel collection
+    const restaurant = await RestaurantModel.findByIdAndUpdate(
+      restaurantId,
+      updatedRestaurantDetails,
+      { new: true }
+    );
+    if (!restaurant) {
+      return res.status(404).json({ error: 'Restaurant not found in the database' });
+    }
+
+    res.json({ message: 'Restaurant details updated successfully', restaurant });
+  } catch (err) {
+    console.error("Error editing restaurant: ", err);
+    res.status(500).json({ error: 'Error editing restaurant' });
+  }
+});
+router.put('/editMeetingInTrip/:tripId/:meetingId', authenticateToken, async (req, res) => {
+  const { tripId, meetingId } = req.params;
+  const updatedMeetingDetails = req.body;
+
+  if (!updatedMeetingDetails || Object.keys(updatedMeetingDetails).length === 0) {
+    return res.status(400).json({ error: 'Updated meeting details are required' });
+  }
+
+  try {
+    // Find the trip for the authenticated user
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Check if the meeting ID exists in the trip's meetingDetails array
+    if (!trip.meetingDetails.includes(meetingId)) {
+      return res.status(404).json({ error: 'Meeting not found in this trip' });
+    }
+
+    // Find and update the meeting in the MeetingModel collection
+    const meeting = await MeetingModel.findByIdAndUpdate(meetingId, updatedMeetingDetails, { new: true });
+    if (!meeting) {
+      return res.status(404).json({ error: 'Meeting not found in the database' });
+    }
+
+    res.json({ message: 'Meeting details updated successfully', meeting });
+  } catch (err) {
+    console.error("Error editing meeting: ", err);
+    res.status(500).json({ error: 'Error editing meeting' });
+  }
+});
+router.put('/editRailInTrip/:tripId/:railId', authenticateToken, async (req, res) => {
+  const { tripId, railId } = req.params;
+  const updatedRailDetails = req.body;
+
+  // Check if the required fields are present
+  if (!updatedRailDetails || Object.keys(updatedRailDetails).length === 0) {
+    return res.status(400).json({ error: 'Updated rail details are required' });
+  }
+
+  try {
+    // Find the trip for the authenticated user
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Check if the rail ID exists in the trip's railDetails array
+    const railIndex = trip.railDetails.indexOf(railId);
+    if (railIndex === -1) {
+      return res.status(404).json({ error: 'Rail detail not found in this trip' });
+    }
+
+    // Find and update the rail in the RailModel collection
+    const rail = await RailModel.findByIdAndUpdate(railId, updatedRailDetails, { new: true });
+    if (!rail) {
+      return res.status(404).json({ error: 'Rail detail not found in the database' });
+    }
+
+    // Return the updated trip and rail details
+    res.json({ message: 'Rail details updated successfully', rail });
+  } catch (err) {
+    console.error("Error editing rail detail: ", err);
+    res.status(500).json({ error: 'Error editing rail detail' });
+  }
+});
+router.put('/editActivityInTrip/:tripId/:activityId', authenticateToken, async (req, res) => {
+  const { tripId, activityId } = req.params;
+  const updatedActivityDetails = req.body;
+
+  if (!updatedActivityDetails || Object.keys(updatedActivityDetails).length === 0) {
+    return res.status(400).json({ error: 'Updated activity details are required' });
+  }
+
+  try {
+    // Find the trip for the authenticated user
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    // Check if the activity ID exists in the trip's activityDetails array
+    if (!trip.activityDetails.includes(activityId)) {
+      return res.status(404).json({ error: 'Activity not found in this trip' });
+    }
+
+    // Find and update the activity in the ActivityModel collection
+    const updatedActivity = await ActivityModel.findByIdAndUpdate(activityId, updatedActivityDetails, { new: true });
+    if (!updatedActivity) {
+      return res.status(404).json({ error: 'Activity not found in the database' });
+    }
+
+    res.json({ message: 'Activity details updated successfully', activity: updatedActivity });
+  } catch (err) {
+    console.error("Error editing activity: ", err);
+    res.status(500).json({ error: 'Error editing activity' });
+  }
+});
 
 
 module.exports = router;

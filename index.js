@@ -16,7 +16,7 @@ const ContactModel=require("./Schema/ContactSupport")
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 8000;
-const SECRET_KEY = "your_secret_key";
+const SECRET_KEY = "mmgtech1234";
 app.use(cors({ origin: "*", credentials: true, optionSuccessStatus: 200 }));
 app.use(express.json());
 
@@ -254,7 +254,6 @@ app.post("/mglogin", async (req, res) => {
   }
 });
 
-
 // Verify OTP
 // app.post("/verify-otp", async (req, res) => {
 //   const { email, otp } = req.body;
@@ -333,6 +332,140 @@ const token = jwt.sign({ userId: user._id }, SECRET_KEY, { expiresIn: "30d" });
     res.status(500).json({ error: "OTP verification failed" });
   }
 });
+//without verify otp
+app.post("/forgot-Password", async (req, res) => {
+  const { email, newPassword } = req.body;
+
+  if (!email || !newPassword) {
+    return res.status(400).json({ message: "Email and new password are required." });
+  }
+
+  try {
+    const user = await SignupModel.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update the password in the database
+    user.password = hashedPassword;
+    await user.save();
+
+    // Log the user object after the password update to confirm the hash
+    console.log('Updated user object:', user); 
+
+    res.json({ message: "Password updated successfully" });
+  } catch (err) {
+    console.error("Error during password update:", err);
+    res.status(500).json({ error: "Password update failed" });
+  }
+});
+
+//with verify otp
+app.post("/forgotpassword", async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await SignupModel.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User with this email does not exist" });
+    }
+
+    // Generate a 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000);
+
+    // Send OTP via email
+    const mailOptions = {
+      from: process.env.EMAIL,
+      to: email,
+      subject: "Password Reset OTP",
+      text: `
+    Dear User,
+
+    This is your One-Time Password (OTP) for password reset: ${otp}
+
+    Please do not share this OTP with anyone.
+    It will expire in 10 minutes.
+
+    Note: This is an auto-generated email. Please do not reply to this message.
+
+    Thank you for using our App
+    PlanEzy Team
+    Happy Planning 😊
+      `,
+    };
+
+    transporter.sendMail(mailOptions, async (err, info) => {
+      if (err) {
+        console.error("Error sending OTP email:", err);
+        return res.status(500).json({ message: "Error sending OTP email" });
+      }
+
+      console.log("OTP email sent:", info.response);
+
+      // Save OTP and expiration in the user document
+      user.otp = otp;
+      user.otpExpires = Date.now() + 10 * 60 * 1000; // OTP valid for 10 minutes
+      await user.save();
+
+      res.json({ message: "OTP sent successfully. Please check your email to reset your password." });
+    });
+  } catch (err) {
+    console.error("Error during forgot password request:", err);
+    res.status(500).json({ error: "Failed to process forgot password request" });
+  }
+});
+app.post("/resetpassword", async (req, res) => {
+  const { email, otp, newPassword } = req.body;
+
+  try {
+    const user = await SignupModel.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User with this email does not exist" });
+    }
+
+    // Check if OTP exists and is valid
+    if (user.otp !== otp) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    // Check if OTP has expired
+    if (user.otpExpires < Date.now()) {
+      return res.status(400).json({ message: "OTP has expired" });
+    }
+
+    // Hash the new password before saving
+    user.password = await bcrypt.hash(newPassword, 10);
+    user.otp = undefined; // Clear OTP after use
+    user.otpExpires = undefined; // Clear OTP expiration
+
+    await user.save();
+
+    // Send confirmation email
+    const mailOptions = {
+      from: 'your-email@gmail.com', // Replace with your email
+      to: email, // Recipient's email
+      subject: 'Password Reset Confirmation',
+      text: `Hi ${user.firstName},\n\nYour password has been successfully reset. You can now log in with your new password.\n\nIf you did not request this change, please contact our support team immediately.\n\nThank you,\nPlanEzy Team`
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error sending confirmation email:", error);
+      } else {
+        console.log("Confirmation email sent:", info.response);
+      }
+    });
+
+    res.json({ message: "Password has been reset successfully. You can now log in with your new password." });
+  } catch (err) {
+    console.error("Error during password reset:", err);
+    res.status(500).json({ error: "Failed to reset password" });
+  }
+});
+
 
 app.put('/users/:id', async (req, res) => {
   const { id } = req.params;
@@ -356,7 +489,6 @@ app.put('/users/:id', async (req, res) => {
 });
 
 
-// Other routes...
 // Add Place
 app.post("/addplace", async (req, res) => {
   try {
@@ -377,9 +509,7 @@ app.post('/addtrendingplace', (req, res) => {
     });
 });
 
-  // app.use('/trip', tripRoutes);
-
-
+// app.use('/trip', tripRoutes);
 // craete recommended trip
 app.post('/addRecommendedTrip', (req, res) => {
   RecommendedPlaceModel.create(req.body)
@@ -391,51 +521,6 @@ app.post('/addRecommendedTrip', (req, res) => {
     });
 });
 
-
-// app.delete('/deleteTrip/:tripId', authenticateToken, async (req, res) => {
-//   const { tripId } = req.params;
-
-//   try {
-//     // Validate Trip ID format
-//     if (!mongoose.Types.ObjectId.isValid(tripId)) {
-//       return res.status(400).json({ error: 'Invalid Trip ID format' });
-//     }
-
-//     // Find the trip by ID and ensure it belongs to the authenticated user
-//     const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
-
-//     if (!trip) {
-//       return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
-//     }
-
-//     // Delete associated itinerary details
-//     const deletePromises = [];
-//     if (trip.flightDetails) deletePromises.push(FlightModel.findByIdAndDelete(trip.flightDetails));
-//     if (trip.carDetails) deletePromises.push(CarModel.findByIdAndDelete(trip.carDetails));
-//     if (trip.hotelDetails) deletePromises.push(HotelModel.findByIdAndDelete(trip.hotelDetails));
-//     if (trip.restaurantDetails) deletePromises.push(RestaurantModel.findByIdAndDelete(trip.restaurantDetails));
-//     if (trip.meetingDetails) deletePromises.push(MeetingModel.findByIdAndDelete(trip.meetingDetails));
-//     if (trip.railDetails) deletePromises.push(RailModel.findByIdAndDelete(trip.railDetails));
-//     if (trip.activityDetails) deletePromises.push(ActivityModel.findByIdAndDelete(trip.activityDetails));
-
-//     await Promise.all(deletePromises);
-
-//     // Delete the trip itself
-//     await TripModel.findByIdAndDelete(tripId);
-
-//     res.json({ message: 'Trip and associated details deleted successfully' });
-//   } catch (err) {
-//     console.error('Error deleting trip:', err);
-//     res.status(500).json({ error: 'Error deleting trip' });
-//   }
-// });
-
-
-
-
-
-
-
 //community post
 app.post('/createPost', (req, res) => {
   CommunityModel.create(req.body)
@@ -446,17 +531,7 @@ app.post('/createPost', (req, res) => {
       console.log("Error during adding the place: ", err);
     });
 });
-//support
-// app.post('/contact',async (req, res) => {
-//   try {
-//     const contact = new ContactModel(req.body);
-//     await contact.save();
-//     res.status(201).json({ message: " Submitted successfully" });
-//   } catch (err) {
-//     console.error("Error during user signup:", err);
-//     res.status(500).json({ error: "Not Submitted" });
-//   }
-// });
+
 
 
 // Function to send email
@@ -552,12 +627,7 @@ app.get('/gettrendingplace' ,(req,res)=>{
   .catch(err=>res.json(err))
 
 })
-// app.get('/getUser', (req, res) => {
-//   SignupModel.find({}).sort('-date') 
 
-//   .then(Signup => res.json(Signup))
-//   .catch(err=>res.json(err));
-// });
 app.get('/getUser', (req, res) => {
   const userEmail = req.headers['user-email'];
 
