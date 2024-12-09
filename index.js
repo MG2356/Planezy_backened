@@ -16,7 +16,7 @@ const ContactModel=require("./Schema/ContactSupport")
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 8000;
-const SECRET_KEY = "mmgtech1234";
+const SECRET_KEY = "your_secret_key";
 app.use(cors({ origin: "*", credentials: true, optionSuccessStatus: 200 }));
 app.use(express.json());
 
