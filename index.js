@@ -182,11 +182,11 @@ app.post('/Register',async (req, res) => {
     res.status(500).json({ error: "User signup failed" });
   }
 });
-app.post("/Login", async(req, res) => {
+app.post("/Login", async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await SignupModel.findOne({ email });
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    if (!user || user.password !== password) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
@@ -198,14 +198,18 @@ app.post("/Login", async(req, res) => {
   }
 });
 
+
 // User Login with OTP
 app.post("/mglogin", async (req, res) => {
   const { email, password } = req.body;
 
   try {
     const user = await SignupModel.findOne({ email });
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res.status(401).json({ message: "Invalid credentials" });
+    // if (!user || !(await bcrypt.compare(password, user.password))) {
+    //   return res.status(401).json({ message: "Invalid credentials" });
+    // }
+    if (!user || user.password !== password) {
+      return res.status(401).json({ message: 'Invalid credentials' });
     }
 
     // Generate a 6-digit OTP
