@@ -384,6 +384,7 @@ app.post("/verify-otp", async (req, res) => {
   }
 });
 
+
 //without verify otp
 app.post("/forgot-Password", async (req, res) => {
   const { email, newPassword } = req.body;
