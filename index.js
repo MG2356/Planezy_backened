@@ -289,6 +289,51 @@ app.post("/mglogin", async (req, res) => {
 //     res.status(500).json({ error: "OTP verification failed" });
 //   }
 // });
+//testotp
+// app.post("/verify-otp", async (req, res) => {
+//   const { email, otp } = req.body;
+
+//   try {
+//     // Find the user by email
+//     const user = await SignupModel.findOne({ email });
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+
+//     // Check if OTP is expired or invalid
+//     if (user.otp !== otp && otp !== "123456") {
+//       if (!user.otp || user.otpExpires < Date.now()) {
+//         return res.status(400).json({ message: "OTP expired or not found" });
+//       }
+//       return res.status(401).json({ message: "Invalid OTP" });
+//     }
+
+//     // Clear OTP after successful verification
+//     user.otp = undefined;
+//     user.otpExpires = undefined;
+//     await user.save();
+
+//     // Generate JWT token with 30 days expiration
+//     const token = jwt.sign({ userId: user._id }, SECRET_KEY, { expiresIn: "30d" });
+
+//     // Include the user's name in the response
+//     const responseData = {
+//       message: "OTP verified successfully",
+//       token,
+//       user: {
+//         firstName: user.firstName,
+//         lastName: user.lastName,
+//         email: user.email,
+//         phoneNumber: user.phoneNumber,
+//       },
+//     };
+
+//     res.json(responseData);
+//   } catch (err) {
+//     console.error("Error during OTP verification:", err);
+//     res.status(500).json({ error: "OTP verification failed" });
+//   }
+// });
 app.post("/verify-otp", async (req, res) => {
   const { email, otp } = req.body;
 
@@ -299,8 +344,13 @@ app.post("/verify-otp", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // Check if the dummy OTP is used with the allowed email
+    if (otp === "123456" && email !== "test@gmail.com") {
+      return res.status(401).json({ message: "Invalid OTP for this email" });
+    }
+
     // Check if OTP is expired or invalid
-    if (user.otp !== otp && otp !== "123456") {
+    if (user.otp !== otp && !(otp === "123456" && email === "test@gmail.com")) {
       if (!user.otp || user.otpExpires < Date.now()) {
         return res.status(400).json({ message: "OTP expired or not found" });
       }
@@ -419,6 +469,55 @@ app.post("/forgotpassword", async (req, res) => {
     res.status(500).json({ error: "Failed to process forgot password request" });
   }
 });
+// app.post("/resetpassword", async (req, res) => {
+//   const { email, otp, newPassword } = req.body;
+
+//   try {
+//     const user = await SignupModel.findOne({ email });
+//     if (!user) {
+//       return res.status(404).json({ message: "User with this email does not exist" });
+//     }
+
+//     // Check if OTP exists and is valid
+//     if (user.otp !== otp) {
+//       return res.status(400).json({ message: "Invalid OTP" });
+//     }
+
+//     // Check if OTP has expired
+//     if (user.otpExpires < Date.now()) {
+//       return res.status(400).json({ message: "OTP has expired" });
+//     }
+
+//     // Hash the new password before saving
+//     user.password = await bcrypt.hash(newPassword, 10);
+//     user.otp = undefined; // Clear OTP after use
+//     user.otpExpires = undefined; // Clear OTP expiration
+
+//     await user.save();
+
+//     // Send confirmation email
+//     const mailOptions = {
+//       from: 'your-email@gmail.com', // Replace with your email
+//       to: email, // Recipient's email
+//       subject: 'Password Reset Confirmation',
+//       text: `Hi ${user.firstName},\n\nYour password has been successfully reset. You can now log in with your new password.\n\nIf you did not request this change, please contact our support team immediately.\n\nThank you,\nPlanEzy Team`
+//     };
+
+//     transporter.sendMail(mailOptions, (error, info) => {
+//       if (error) {
+//         console.error("Error sending confirmation email:", error);
+//       } else {
+//         console.log("Confirmation email sent:", info.response);
+//       }
+//     });
+
+//     res.json({ message: "Password has been reset successfully. You can now log in with your new password." });
+//   } catch (err) {
+//     console.error("Error during password reset:", err);
+//     res.status(500).json({ error: "Failed to reset password" });
+//   }
+// });
+
 app.post("/resetpassword", async (req, res) => {
   const { email, otp, newPassword } = req.body;
 
@@ -438,8 +537,8 @@ app.post("/resetpassword", async (req, res) => {
       return res.status(400).json({ message: "OTP has expired" });
     }
 
-    // Hash the new password before saving
-    user.password = await bcrypt.hash(newPassword, 10);
+    // Directly save the new password (not recommended)
+    user.password = newPassword; // No hashing, storing plain text (for testing only)
     user.otp = undefined; // Clear OTP after use
     user.otpExpires = undefined; // Clear OTP expiration
 
@@ -467,7 +566,6 @@ app.post("/resetpassword", async (req, res) => {
     res.status(500).json({ error: "Failed to reset password" });
   }
 });
-
 
 app.put('/users/:id', async (req, res) => {
   const { id } = req.params;
