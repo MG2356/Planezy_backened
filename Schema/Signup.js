@@ -34,7 +34,7 @@ const SignupSchema = new mongoose.Schema({
   lastName: String,
   email: { type: String, unique: true },
   password: String,
-  phoneNumber: { type: String, unique: true },
+ // phoneNumber: { type: String, unique: true },
   otp: String,
   otpExpires: Date,
 });

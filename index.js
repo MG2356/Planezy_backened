@@ -217,7 +217,9 @@ app.post("/mglogin", async (req, res) => {
 
     // Send OTP via email
     const mailOptions = {
-      from: process.env.EMAIL,
+     // from: process.env.EMAIL,
+      from: `PlanEzy <planezyalerts@gmail.com>`,
+
       to: email,
       subject: " Your OTP for Login",
       text: `
@@ -373,7 +375,7 @@ app.post("/verify-otp", async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        phoneNumber: user.phoneNumber,
+       // phoneNumber: user.phoneNumber,
       },
     };
 
@@ -431,7 +433,8 @@ app.post("/forgotpassword", async (req, res) => {
 
     // Send OTP via email
     const mailOptions = {
-      from: process.env.EMAIL,
+      // from: process.env.EMAIL,
+      from: `PlanEzy <planezyalerts@gmail.com>`,
       to: email,
       subject: "Password Reset OTP",
       text: `
@@ -547,7 +550,10 @@ app.post("/resetpassword", async (req, res) => {
 
     // Send confirmation email
     const mailOptions = {
-      from: 'your-email@gmail.com', // Replace with your email
+      // from: 'your-email@gmail.com',
+      from: `PlanEzy <planezyalerts@gmail.com>`,
+
+      // Replace with your email
       to: email, // Recipient's email
       subject: 'Password Reset Confirmation',
       text: `Hi ${user.firstName},\n\nYour password has been successfully reset. You can now log in with your new password.\n\nIf you did not request this change, please contact our support team immediately.\n\nThank you,\nPlanEzy Team`
@@ -639,7 +645,8 @@ app.post('/createPost', (req, res) => {
 
 const sendThankYouEmail = (userEmail, userName) => {
   const mailOptions = {
-    from: 'planezyalerts@gmail.com', // Replace with your email address
+    from: 'planezyalerts@gmail.com', 
+    // Replace with your email address
     to: userEmail,
     subject: `Thank you for contacting us, ${userName}!`,
     subject: `Thank you for contacting us, ${userName}!`,

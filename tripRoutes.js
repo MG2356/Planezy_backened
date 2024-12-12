@@ -36,7 +36,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 router.put('/useredit', authenticateToken, async (req, res) => {
-  const { firstName, lastName, phoneNumber } = req.body;
+  const { firstName, lastName } = req.body;
 
   try {
     // Extract user ID from authenticated token
@@ -49,7 +49,7 @@ router.put('/useredit', authenticateToken, async (req, res) => {
     // Update the user's details
     const updatedUser = await SignupModel.findByIdAndUpdate(
       userId,
-      { firstName, lastName, phoneNumber },
+      { firstName, lastName },
       { new: true, runValidators: true } // Return the updated document and apply schema validation
     );
 
@@ -75,7 +75,10 @@ router.delete('/deleteAccount', authenticateToken, async (req, res) => {
 
     // Send account deletion email
     const mailOptions = {
-      from: 'your-email@gmail.com', // Replace with your email
+     // from: 'your-email@gmail.com',
+      from: `PlanEzy <planezyalerts@gmail.com>`,
+
+      // Replace with your email
       to: user.email, // Send the email to the user's email address
       subject: 'Account Deletion Confirmation',
       text: `Hello ${user.firstName},
