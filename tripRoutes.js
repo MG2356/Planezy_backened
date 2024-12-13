@@ -289,27 +289,46 @@ router.post('/addCarToTrip', authenticateToken, async (req, res) => {
 //       res.status(500).json({ error: 'Error adding Restaurant details' });
 //     }
 //   });
-router.post('/addRestaurantToTrip', authenticateToken, async (req, res) => {
-  const { tripId, restaurantDetails } = req.body;
+// router.post('/addRestaurantToTrip', authenticateToken, async (req, res) => {
+//   const { tripId, restaurantDetails } = req.body;
 
-  if (!tripId || !restaurantDetails) {
-    return res.status(400).json({ error: 'Trip ID and restaurant details are required' });
-  }
+//   if (!tripId || !restaurantDetails) {
+//     return res.status(400).json({ error: 'Trip ID and restaurant details are required' });
+//   }
 
+//   try {
+//     const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+//     if (!trip) return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+
+//     const restaurant = new RestaurantModel({ ...restaurantDetails, tripId });
+//     await restaurant.save();
+
+//     trip.restaurantDetails = restaurant._id;
+//     await trip.save();
+
+//     res.json({ message: 'restaurant details added to the trip successfully', trip });
+//   } catch (err) {
+//     console.error("Error adding hotel details: ", err);
+//     res.status(500).json({ error: 'Error adding hotel details' });
+//   }
+// });
+router.post("/addRestaurantToTrip", async (req, res) => {
   try {
-    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
-    if (!trip) return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+      const { tripId, restaurantDetails } = req.body;
 
-    const restaurant = new RestaurantModel({ ...restaurantDetails, tripId });
-    await restaurant.save();
+      if (!tripId || !restaurantDetails) {
+          return res.status(400).json({ message: "Invalid data format" });
+      }
 
-    trip.restaurantDetails = restaurant._id;
-    await trip.save();
+      console.log("Request Body:", req.body);
 
-    res.json({ message: 'restaurant details added to the trip successfully', trip });
-  } catch (err) {
-    console.error("Error adding hotel details: ", err);
-    res.status(500).json({ error: 'Error adding hotel details' });
+      const newRestaurant = new RestaurantModel(restaurantDetails);
+      await newRestaurant.save();
+
+      res.status(200).json({ message: "Restaurant added successfully", restaurant: newRestaurant });
+  } catch (error) {
+      console.error("Error saving restaurant:", error);
+      res.status(500).json({ message: "Internal server error" });
   }
 });
 //Meeting 

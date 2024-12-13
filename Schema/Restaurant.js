@@ -8,31 +8,54 @@ const mongoose = require('mongoose');
 // });
 
 
-const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+// const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
+// const RestaurantSchema = new mongoose.Schema({
+//   restaurantName: { type: String, required: true },
+//   restaurantLocation: { type: String, required: true },
+//   restaurantOpeningTime: { 
+//     type: String, 
+//     required: true, 
+//     validate: {
+//       validator: function (v) {
+//         return timeRegex.test(v);
+//       },
+//       message: props => `${props.value} is not a valid time format (HH:mm)!`
+//     }
+//   },
+//   restaurantClosingTime: { 
+//     type: String, 
+//     required: true, 
+//     validate: {
+//       validator: function (v) {
+//         return timeRegex.test(v);
+//       },
+//       message: props => `${props.value} is not a valid time format (HH:mm)!`
+//     }
+//   },
+// });
+const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
+
+// Mongoose Schema
 const RestaurantSchema = new mongoose.Schema({
-  restaurantName: { type: String, required: true },
-  restaurantLocation: { type: String, required: true },
-  restaurantOpeningTime: { 
-    type: String, 
-    required: true, 
-    validate: {
-      validator: function (v) {
-        return timeRegex.test(v);
-      },
-      message: props => `${props.value} is not a valid time format (HH:mm)!`
+    restaurantName: { type: String, required: true },
+    restaurantLocation: { type: String, required: true },
+    restaurantOpeningTime: {
+        type: String,
+        required: true,
+        validate: {
+            validator: (v) => timeRegex.test(v),
+            message: (props) => `${props.value} is not a valid time format (HH:mm)!`
+        }
+    },
+    restaurantClosingTime: {
+        type: String,
+        required: true,
+        validate: {
+            validator: (v) => timeRegex.test(v),
+            message: (props) => `${props.value} is not a valid time format (HH:mm)!`
+        }
     }
-  },
-  restaurantClosingTime: { 
-    type: String, 
-    required: true, 
-    validate: {
-      validator: function (v) {
-        return timeRegex.test(v);
-      },
-      message: props => `${props.value} is not a valid time format (HH:mm)!`
-    }
-  },
 });
 const RestaurantModel = mongoose.model("Restaurant", RestaurantSchema);
 module.exports = RestaurantModel;
