@@ -255,40 +255,40 @@ router.post('/addCarToTrip', authenticateToken, async (req, res) => {
   });
 
 //restaurant 
-router.post('/addRestaurantToTrip', authenticateToken, async (req, res) => {
-    const { tripId, restaurantDetails } = req.body;
+// router.post('/addRestaurantToTrip', authenticateToken, async (req, res) => {
+//     const { tripId, restaurantDetails } = req.body;
   
 
-    if (!tripId || !Array.isArray(restaurantDetails) || restaurantDetails.length === 0) {
-      return res.status(400).json({ error: 'Trip ID and an array of Restaurant details are required' });
-    }
+//     if (!tripId || !Array.isArray(restaurantDetails) || restaurantDetails.length === 0) {
+//       return res.status(400).json({ error: 'Trip ID and an array of Restaurant details are required' });
+//     }
   
-    try {
-      // Find the trip for the authenticated user
-      const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
-      if (!trip) {
-        return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
-      }
+//     try {
+//       // Find the trip for the authenticated user
+//       const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+//       if (!trip) {
+//         return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+//       }
   
-      // Save each flight detail and store their IDs
-      const savedRestaurant = await Promise.all(
-        restaurantDetails.map(async (restaurant) => {
-          const newRestaurant = new RestaurantModel({ ...restaurant });
-          await newRestaurant.save();
-          return newRestaurant._id; // Return the saved flight's ID
-        })
-      );
+//       // Save each flight detail and store their IDs
+//       const savedRestaurant = await Promise.all(
+//         restaurantDetails.map(async (restaurant) => {
+//           const newRestaurant = new RestaurantModel({ ...restaurant });
+//           await newRestaurant.save();
+//           return newRestaurant._id; // Return the saved flight's ID
+//         })
+//       );
   
-      // Update the trip's restaurantDetails array
-      trip.restaurantDetails = [...trip.restaurantDetails, ...savedRestaurant];
-      await trip.save();
+//       // Update the trip's restaurantDetails array
+//       trip.restaurantDetails = [...trip.restaurantDetails, ...savedRestaurant];
+//       await trip.save();
   
-      res.json({ message: 'Restaurant details added to the trip successfully', trip });
-    } catch (err) {
-      console.error("Error adding Restaurant details: ", err);
-      res.status(500).json({ error: 'Error adding Restaurant details' });
-    }
-  });
+//       res.json({ message: 'Restaurant details added to the trip successfully', trip });
+//     } catch (err) {
+//       console.error("Error adding Restaurant details: ", err);
+//       res.status(500).json({ error: 'Error adding Restaurant details' });
+//     }
+//   });
 // router.post('/addRestaurantToTrip', authenticateToken, async (req, res) => {
 //   const { tripId, restaurantDetails } = req.body;
 
@@ -312,7 +312,43 @@ router.post('/addRestaurantToTrip', authenticateToken, async (req, res) => {
 //     res.status(500).json({ error: 'Error adding hotel details' });
 //   }
 // });
+router.post('/addRestaurantToTrip', authenticateToken, async (req, res) => {
+  const { tripId, restaurantDetails } = req.body;
 
+  console.log("Received Request Body: ", req.body);
+
+  if (!tripId || !restaurantDetails) {
+    console.error("Validation Error: Missing Trip ID or Restaurant Details");
+    return res.status(400).json({ error: 'Trip ID and restaurant details are required' });
+  }
+
+  try {
+    const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
+    if (!trip) {
+      console.error("Trip Not Found or Unauthorized Access");
+      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
+    }
+
+    console.log("Found Trip: ", trip);
+
+    const restaurant = new RestaurantModel({ ...restaurantDetails, tripId });
+    console.log("Saving Restaurant: ", restaurant);
+
+    await restaurant.save();
+
+    console.log("Restaurant Saved: ", restaurant);
+
+    trip.restaurantDetails = restaurant._id;
+    await trip.save();
+
+    console.log("Trip Updated with Restaurant Details");
+
+    res.json({ message: 'Restaurant details added to the trip successfully', trip });
+  } catch (err) {
+    console.error("Error adding restaurant details: ", err);
+    res.status(500).json({ error: 'Error adding restaurant details' });
+  }
+});
 
 // router.post("/addRestaurantToTrip", async (req, res) => {
 //   try {
