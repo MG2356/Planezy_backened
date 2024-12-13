@@ -22,7 +22,7 @@ const TripSchema = new mongoose.Schema({
   flightDetails: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Flight' }],
   hotelDetails: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Hotel' }],
   carDetails: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Car' }],
-  restaurantDetails: { type: mongoose.Schema.Types.ObjectId, ref: 'Restaurant' },
+  restaurantDetails: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Restaurant' }],
   railDetails:[{ type: mongoose.Schema.Types.ObjectId, ref: 'Rail' }],
   meetingDetails:[{ type: mongoose.Schema.Types.ObjectId, ref: 'Meeting' }],
   activityDetails:[{ type: mongoose.Schema.Types.ObjectId, ref: 'Activity' }]
