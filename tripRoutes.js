@@ -289,67 +289,29 @@ router.post('/addCarToTrip', authenticateToken, async (req, res) => {
 //       res.status(500).json({ error: 'Error adding Restaurant details' });
 //     }
 //   });
-// router.post('/addRestaurantToTrip', authenticateToken, async (req, res) => {
-//   const { tripId, restaurantDetails } = req.body;
-
-//   if (!tripId || !restaurantDetails) {
-//     return res.status(400).json({ error: 'Trip ID and restaurant details are required' });
-//   }
-
-//   try {
-//     const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
-//     if (!trip) return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
-
-//     const restaurant = new RestaurantModel({ ...restaurantDetails, tripId });
-//     await restaurant.save();
-
-//     trip.restaurantDetails = restaurant._id;
-//     await trip.save();
-
-//     res.json({ message: 'restaurant details added to the trip successfully', trip });
-//   } catch (err) {
-//     console.error("Error adding hotel details: ", err);
-//     res.status(500).json({ error: 'Error adding hotel details' });
-//   }
-// });
 router.post('/addRestaurantToTrip', authenticateToken, async (req, res) => {
   const { tripId, restaurantDetails } = req.body;
 
-  console.log("Received Request Body: ", req.body);
-
   if (!tripId || !restaurantDetails) {
-    console.error("Validation Error: Missing Trip ID or Restaurant Details");
     return res.status(400).json({ error: 'Trip ID and restaurant details are required' });
   }
 
   try {
     const trip = await TripModel.findOne({ _id: tripId, userId: req.userId });
-    if (!trip) {
-      console.error("Trip Not Found or Unauthorized Access");
-      return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
-    }
-
-    console.log("Found Trip: ", trip);
+    if (!trip) return res.status(404).json({ error: 'Trip not found or does not belong to this user' });
 
     const restaurant = new RestaurantModel({ ...restaurantDetails, tripId });
-    console.log("Saving Restaurant: ", restaurant);
-
     await restaurant.save();
-
-    console.log("Restaurant Saved: ", restaurant);
 
     trip.restaurantDetails = restaurant._id;
     await trip.save();
 
-    console.log("Trip Updated with Restaurant Details");
-
-    res.json({ message: 'Restaurant details added to the trip successfully', trip });
+    res.json({ message: 'restaurant details added to the trip successfully', trip });
   } catch (err) {
-    console.error("Error adding restaurant details: ", err);
-    res.status(500).json({ error: 'Error adding restaurant details' });
+    console.error("Error adding hotel details: ", err);
+    res.status(500).json({ error: 'Error adding hotel details' });
   }
 });
-
 // router.post("/addRestaurantToTrip", async (req, res) => {
 //   try {
 //       console.log("Request Body:", req.body); // Log the incoming request
