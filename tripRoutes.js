@@ -314,23 +314,27 @@ router.post('/addCarToTrip', authenticateToken, async (req, res) => {
 // });
 router.post("/addRestaurantToTrip", async (req, res) => {
   try {
+      console.log("Request Body:", req.body); // Log the incoming request
       const { tripId, restaurantDetails } = req.body;
 
       if (!tripId || !restaurantDetails) {
+          console.log("Validation Failed: Missing tripId or restaurantDetails");
           return res.status(400).json({ message: "Invalid data format" });
       }
 
-      console.log("Request Body:", req.body);
+      console.log("Restaurant Details:", restaurantDetails); // Log parsed details
 
       const newRestaurant = new RestaurantModel(restaurantDetails);
       await newRestaurant.save();
 
+      console.log("Restaurant Saved Successfully:", newRestaurant);
       res.status(200).json({ message: "Restaurant added successfully", restaurant: newRestaurant });
   } catch (error) {
-      console.error("Error saving restaurant:", error);
+      console.error("Error in /addRestaurantToTrip:", error); // Log error details
       res.status(500).json({ message: "Internal server error" });
   }
 });
+
 //Meeting 
 router.post('/addMeetingToTrip', authenticateToken, async (req, res) => {
   const { tripId, meetingDetails } = req.body;
